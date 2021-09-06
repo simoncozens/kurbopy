@@ -2,7 +2,7 @@
 
 [![documentation](https://readthedocs.org/projects/kurbopy/badge/)](https://kurbopy.readthedocs.io)
 [![pypi](https://img.shields.io/pypi/v/kurbopy)](https://pypi.org/project/kurbopy/)
-![github actions]https://img.shields.io/github/workflow/status/simoncozens/kurbopy/CI
+![github actions](https://img.shields.io/github/workflow/status/simoncozens/kurbopy/CI)
 
 Kurbopy is a Python wrapper around the Rust [kurbo](https://github.com/linebender/kurbo)
 library, a 2D curve manipulation library with "a focus on accuracy and good

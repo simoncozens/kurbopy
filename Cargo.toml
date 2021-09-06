@@ -1,12 +1,11 @@
 [package]
 name = "kurbopy"
-version = "1.0.0"
+version = "0.8.10"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2018"
 
 [dependencies]
-#kurbo = { git = "https://github.com/linebender/kurbo" }
-kurbo = { path = "/Users/simon/others-repos/kurbo" }
+kurbo = { version = "0.8.1" }
 pyo3 = { version = "^0.14", features = ["extension-module"] }
 
 [lib]

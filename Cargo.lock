@@ -55,13 +55,15 @@ dependencies = [
 [[package]]
 name = "kurbo"
 version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e30b1df631d23875f230ed3ddd1a88c231f269a04b2044eb6ca87e763b5f4c42"
 dependencies = [
  "arrayvec",
 ]
 
 [[package]]
 name = "kurbopy"
-version = "1.0.0"
+version = "0.8.10"
 dependencies = [
  "kurbo",
  "pyo3",

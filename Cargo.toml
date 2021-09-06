@@ -1,0 +1,18 @@
+[package]
+name = "kurbopy"
+version = "1.0.0"
+authors = ["Simon Cozens <simon@simon-cozens.org>"]
+edition = "2018"
+
+[dependencies]
+#kurbo = { git = "https://github.com/linebender/kurbo" }
+kurbo = { path = "/Users/simon/others-repos/kurbo" }
+pyo3 = { version = "^0.14", features = ["extension-module"] }
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.maturin]
+classifier = [
+  "Programming Language :: Rust",
+]

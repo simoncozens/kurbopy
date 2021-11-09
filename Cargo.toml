@@ -1,11 +1,11 @@
 [package]
 name = "kurbopy"
-version = "0.8.10"
+version = "0.8.20"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2018"
 
 [dependencies]
-kurbo = { version = "0.8.1" }
+kurbo = { version = "0.8.2" }
 pyo3 = { version = "^0.14", features = ["extension-module"] }
 
 [lib]

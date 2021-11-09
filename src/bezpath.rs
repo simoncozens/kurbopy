@@ -183,48 +183,48 @@ impl BezPath {
 
     // This is not in released kurbo yet
 
-    // /// Computes the minimum distance between this ``BezPath`` and another.
-    // ///
-    // /// Note that this method is not in original kurbo
-    // #[pyo3(text_signature = "($self, other)")]
-    // fn min_distance(&self, other: &BezPath) -> f64 {
-    //     // XXX Not in original kurbo
-    //     let segs1 = self.0.segments();
-    //     let mut best_pair: Option<(f64, kurbo::PathSeg, kurbo::PathSeg)> = None;
-    //     for s1 in segs1 {
-    //         let p1 = vec![
-    //             s1.eval(0.0),
-    //             s1.eval(0.25),
-    //             s1.eval(0.5),
-    //             s1.eval(0.75),
-    //             s1.eval(1.0),
-    //         ];
-    //         for s2 in other.0.segments() {
-    //             let p2 = vec![
-    //                 s2.eval(0.0),
-    //                 s2.eval(0.25),
-    //                 s2.eval(0.5),
-    //                 s2.eval(0.75),
-    //                 s2.eval(1.0),
-    //             ];
-    //             let dist = p1
-    //                 .iter()
-    //                 .zip(p2.iter())
-    //                 .map(|(a, b)| a.distance(*b))
-    //                 .min_by(|a, b| a.partial_cmp(&b).unwrap_or(Ordering::Less))
-    //                 .unwrap();
-    //             if let Some((best, _, _)) = best_pair {
-    //                 if dist > best {
-    //                     continue;
-    //                 }
-    //             }
-    //             best_pair = Some((dist, s1, s2));
-    //         }
-    //     }
-    //     if let Some((_, s1, s2)) = best_pair {
-    //         s1.min_dist(s2, 0.05).0
-    //     } else {
-    //         f64::MAX
-    //     }
-    // }
+    /// Computes the minimum distance between this ``BezPath`` and another.
+    ///
+    /// Note that this method is not in original kurbo
+    #[pyo3(text_signature = "($self, other)")]
+    fn min_distance(&self, other: &BezPath) -> f64 {
+        // XXX Not in original kurbo
+        let segs1 = self.0.segments();
+        let mut best_pair: Option<(f64, kurbo::PathSeg, kurbo::PathSeg)> = None;
+        for s1 in segs1 {
+            let p1 = vec![
+                s1.eval(0.0),
+                s1.eval(0.25),
+                s1.eval(0.5),
+                s1.eval(0.75),
+                s1.eval(1.0),
+            ];
+            for s2 in other.0.segments() {
+                let p2 = vec![
+                    s2.eval(0.0),
+                    s2.eval(0.25),
+                    s2.eval(0.5),
+                    s2.eval(0.75),
+                    s2.eval(1.0),
+                ];
+                let dist = p1
+                    .iter()
+                    .zip(p2.iter())
+                    .map(|(a, b)| a.distance(*b))
+                    .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less))
+                    .unwrap();
+                if let Some((best, _, _)) = best_pair {
+                    if dist > best {
+                        continue;
+                    }
+                }
+                best_pair = Some((dist, s1, s2));
+            }
+        }
+        if let Some((_, s1, s2)) = best_pair {
+            s1.min_dist(s2, 0.05).distance
+        } else {
+            f64::MAX
+        }
+    }
 }

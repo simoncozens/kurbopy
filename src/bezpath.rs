@@ -2,8 +2,8 @@ use crate::line::Line;
 use crate::point::Point;
 use crate::rect::Rect;
 use core::cmp::Ordering;
-use kurbo::BezPath as KBezPath;
-use kurbo::{ParamCurve, PathEl, Shape};
+use kurbo::{BezPath as KBezPath, CubicBez};
+use kurbo::{ParamCurve, PathEl, PathSeg, Shape};
 use pyo3::prelude::*;
 
 #[pyclass(subclass)]
@@ -222,7 +222,25 @@ impl BezPath {
             }
         }
         if let Some((_, s1, s2)) = best_pair {
-            s1.min_dist(s2, 0.05).distance
+            let curve1 = match s1 {
+                PathSeg::Line(_) => PathSeg::Cubic(CubicBez::new(
+                    s1.eval(0.0),
+                    s1.eval(1.0 / 3.0),
+                    s1.eval(2.0 / 3.0),
+                    s1.eval(1.0),
+                )),
+                _ => s1,
+            };
+            let curve2 = match s2 {
+                PathSeg::Line(_) => PathSeg::Cubic(CubicBez::new(
+                    s2.eval(0.0),
+                    s2.eval(1.0 / 3.0),
+                    s2.eval(2.0 / 3.0),
+                    s2.eval(1.0),
+                )),
+                _ => s2,
+            };
+            curve1.min_dist(curve2, 0.05).distance
         } else {
             f64::MAX
         }

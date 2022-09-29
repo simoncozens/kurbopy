@@ -1,6 +1,6 @@
 [package]
 name = "kurbopy"
-version = "0.8.31"
+version = "0.8.32"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2018"
 

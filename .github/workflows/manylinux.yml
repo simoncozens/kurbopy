@@ -12,7 +12,6 @@ jobs:
         with:
           maturin-version: latest
           manylinux: auto
-          rust-toolchain: nightly
           command: build
           args: --release
       - uses: actions/upload-artifact@v1

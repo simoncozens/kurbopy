@@ -55,9 +55,9 @@ impl Rect {
     //     self.0.with_size(size.0).into()
     // }
 
-    // fn inset(&self, inset: Insets) -> Self {
-    //     self.0.inset(inset.0).into()
-    // }
+    fn inset(&self, inset: f64) -> Self {
+        self.0.inset(inset).into()
+    }
 
     /// The width of the rectangle.
     ///

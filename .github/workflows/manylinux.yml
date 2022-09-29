@@ -13,7 +13,7 @@ jobs:
           maturin-version: latest
           manylinux: auto
           command: build
-          args: --release
+          args: --release --find-interpreter
       - uses: actions/upload-artifact@v1
         name: upload-wheel
         with:

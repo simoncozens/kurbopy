@@ -8,8 +8,6 @@ use kurbo::{
 };
 use pyo3::prelude::*;
 
-use pyo3::PyNumberProtocol;
-
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A single line.

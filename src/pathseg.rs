@@ -1,10 +1,7 @@
 use crate::cubicbez::CubicBez;
 use crate::line::Line;
-use crate::point::Point;
 use crate::quadbez::QuadBez;
-use crate::rect::Rect;
 use kurbo::PathSeg as KPathSeg;
-use kurbo::{PathEl, Shape};
 use pyo3::prelude::*;
 
 #[pyclass(subclass)]

@@ -31,19 +31,19 @@ impl Point {
     }
 
     /// Linearly interpolate between two points.
-    #[text_signature = "($self, other, t)"]
+    #[pyo3(text_signature = "($self, other, t)")]
     fn lerp(&self, other: Self, t: f64) -> Self {
         self.0.lerp(other.0, t).into()
     }
 
     /// Determine the midpoint of two points.
-    #[text_signature = "($self, other)"]
+    #[pyo3(text_signature = "($self, other)")]
     fn midpoint(&self, other: Self) -> Self {
         self.0.midpoint(other.0).into()
     }
 
     /// Euclidean distance.
-    #[text_signature = "($self, other)"]
+    #[pyo3(text_signature = "($self, other)")]
     fn distance(&self, other: Self) -> f64 {
         self.0.distance(other.0)
     }

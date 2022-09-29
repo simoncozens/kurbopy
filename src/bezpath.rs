@@ -2,7 +2,8 @@ use crate::line::Line;
 use crate::point::Point;
 use crate::rect::Rect;
 use core::cmp::Ordering;
-use kurbo::{BezPath as KBezPath, CubicBez};
+use itertools::Itertools;
+use kurbo::{Affine, BezPath as KBezPath, CubicBez, Vec2};
 use kurbo::{ParamCurve, PathEl, PathSeg, Shape};
 use pyo3::prelude::*;
 
@@ -181,8 +182,6 @@ impl BezPath {
         intersections
     }
 
-    // This is not in released kurbo yet
-
     /// Computes the minimum distance between this ``BezPath`` and another.
     ///
     /// Note that this method is not in original kurbo
@@ -244,5 +243,54 @@ impl BezPath {
         } else {
             f64::MAX
         }
+    }
+
+    /// Returns true if the two BezPaths intersect
+    ///
+    /// Note that this method is not in original kurbo
+    #[pyo3(text_signature = "($self, other)")]
+    fn intersects(&self, other: &BezPath) -> Vec<Point> {
+        let b1 = &self.0;
+        let b2 = &other.0;
+        if b1.bounding_box().intersect(b2.bounding_box()).area() < f64::EPSILON {
+            return vec![];
+        }
+        let mut rv = vec![];
+        let mut pts1 = vec![];
+        let mut pts2 = vec![];
+        b1.flatten(0.1, |el| match el {
+            PathEl::MoveTo(a) => pts1.push(a),
+            PathEl::LineTo(a) => pts1.push(a),
+            _ => {}
+        });
+        b2.flatten(0.1, |el| match el {
+            PathEl::MoveTo(a) => pts2.push(a),
+            PathEl::LineTo(a) => pts2.push(a),
+            _ => {}
+        });
+        for (&la1, &la2) in pts1.iter().circular_tuple_windows() {
+            for (&lb1, &lb2) in pts2.iter().circular_tuple_windows() {
+                let seg1 = PathSeg::Line(kurbo::Line::new(la1, la2));
+                let seg2 = kurbo::Line::new(lb1, lb2);
+                rv.extend(
+                    seg1.intersect_line(seg2)
+                        .iter()
+                        .map(|x| Point(seg1.eval(x.line_t))),
+                );
+            }
+        }
+        rv
+    }
+
+    #[pyo3(text_signature = "($self, scale_factor)")]
+    fn scale_path(&self, scale_factor: f64) -> BezPath {
+        let c = self.0.bounding_box().center();
+        let c_vec = Vec2::new(c.x, c.y);
+        BezPath(
+            Affine::translate(c_vec)
+                * Affine::scale(scale_factor)
+                * Affine::translate(c_vec * -1.0)
+                * &self.0,
+        )
     }
 }

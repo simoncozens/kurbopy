@@ -1,6 +1,7 @@
 use crate::bezpath::BezPath;
 use crate::line::Line;
 use crate::point::Point;
+use crate::rect::Rect;
 use crate::vec2::Vec2;
 
 use kurbo::TranslateScale as KTranslateScale;
@@ -52,14 +53,14 @@ impl TranslateScale {
 
     #[classmethod]
     /// Create a new transformation with scale only.
-    #[text_signature = "(cls, scale)"]
+    #[pyo3(text_signature = "(cls, scale)")]
     fn scale(_cls: &PyType, scale: f64) -> Self {
         TranslateScale(KTranslateScale::scale(scale))
     }
 
     #[classmethod]
     /// Create a new transformation with translation only.
-    #[text_signature = "(cls, vec2)"]
+    #[pyo3(text_signature = "(cls, vec2)")]
     fn translate(_cls: &PyType, t: Vec2) -> Self {
         TranslateScale(KTranslateScale::translate(t.into()))
     }
@@ -105,6 +106,10 @@ impl TranslateScale {
     }
     fn _mul_Line(&self, rhs: Line) -> PyResult<Line> {
         let p: Line = (self.0 * rhs.0).into();
+        Ok(p)
+    }
+    fn _mul_Rect(&self, rhs: Rect) -> PyResult<Rect> {
+        let p: Rect = (self.0 * rhs.0).into();
         Ok(p)
     }
 }

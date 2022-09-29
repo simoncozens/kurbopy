@@ -45,7 +45,7 @@ impl Vec2 {
     }
 
     /// Dot product of two vectors.
-    #[text_signature = "($self, other)"]
+    #[pyo3(text_signature = "($self, other)")]
     fn dot(&self, other: Vec2) -> f64 {
         self.0.dot(other.0)
     }
@@ -53,7 +53,7 @@ impl Vec2 {
     /// Cross product of two vectors.
     ///
     /// This is signed so that (0, 1) × (1, 0) = 1.
-    #[text_signature = "($self, other)"]
+    #[pyo3(text_signature = "($self, other)")]
     fn cross(&self, other: Vec2) -> f64 {
         self.0.cross(other.0)
     }
@@ -87,13 +87,13 @@ impl Vec2 {
     /// is anti-clockwise. This convention is consistent with
     /// _`Affine.rotate`.
     #[classmethod]
-    #[text_signature = "(cls, th)"]
+    #[pyo3(text_signature = "(cls, th)")]
     fn from_angle(_cls: &PyType, th: f64) -> Self {
         KVec2::from_angle(th).into()
     }
 
     /// Linearly interpolate between two vectors.
-    #[text_signature = "($self, other, t)"]
+    #[pyo3(text_signature = "($self, other, t)")]
     fn lerp(&self, other: Self, t: f64) -> Self {
         self.0.lerp(other.0, t).into()
     }

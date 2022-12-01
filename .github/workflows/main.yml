@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         platform: [macOS-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -18,10 +19,10 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
-      - name: Setup Python environment
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: ${{ matrix.python-version }}
       - name: rust-cargo
         uses: actions-rs/cargo@v1.0.1
         with:

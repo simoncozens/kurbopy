@@ -53,7 +53,7 @@ jobs:
           args: --release --out dist
       - name: Install and test built wheel
         run: |
-          pip install dist/*.whl --force-reinstall
+          pip install (ls dist/*.whl) --force-reinstall
           pip install pytest
           pytest
       - name: Upload wheels

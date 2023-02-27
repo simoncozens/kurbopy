@@ -54,6 +54,9 @@ jobs:
 
   macos:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [universal2-apple-darwin]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -62,7 +65,8 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          args: --release --universal2 --out dist --find-interpreter
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:

@@ -24,6 +24,11 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist
           manylinux: auto
+      - name: Install and test built wheel
+        run: |
+          pip install dist/*.whl --force-reinstall
+          pip install pytest
+          pytest
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -46,6 +51,11 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist
+      - name: Install and test built wheel
+        run: |
+          pip install dist/*.whl --force-reinstall
+          pip install pytest
+          pytest
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -67,6 +77,11 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist
+      - name: Install and test built wheel
+        run: |
+          pip install dist/*.whl --force-reinstall
+          pip install pytest
+          pytest
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:

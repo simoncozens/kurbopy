@@ -1,9 +1,6 @@
 use crate::vec2::Vec2;
 use kurbo::Point as KPoint;
 use pyo3::prelude::*;
-use pyo3::PyObjectProtocol;
-
-use pyo3::PyNumberProtocol;
 
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
@@ -174,27 +171,22 @@ impl Point {
     fn _isub_Vec2(&mut self, other: Vec2) {
         self.0 -= other.0;
     }
-}
 
-#[pyproto]
-impl PyNumberProtocol<'_> for Point {
-    fn __add__(lhs: Self, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __add__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
         Python::with_gil(|py| {
             let magic = PyModule::import(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((lhs, rhs))?.extract()
+            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
         })
     }
-    fn __sub__(lhs: Self, rhs: &PyAny) -> PyResult<PyObject> {
+
+    fn __sub__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
         Python::with_gil(|py| {
             let magic = PyModule::import(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((lhs, rhs))?.extract()
+            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
         })
     }
     // I can't work out how to do magic iadd/isub
-}
 
-#[pyproto]
-impl PyObjectProtocol<'_> for Point {
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("<Point x={:?} y={:?}>", self.0.x, self.0.y))
     }

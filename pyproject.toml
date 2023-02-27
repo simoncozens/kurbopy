@@ -1,13 +1,23 @@
 [build-system]
-requires = ["maturin>=0.11,<0.12"]
+requires = ["maturin>=0.14,<0.15"]
 build-backend = "maturin"
+
+[project]
+name = "kurbopy"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Rust",
+]
+dependencies = [
+    "fontTools >= 4.0",
+]
 
 [tool.maturin]
 bindings = "pyo3"
 
 # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 [tool.black]
-target-version = ["py36"]
+target-version = ["py37"]
 
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
 [tool.isort]

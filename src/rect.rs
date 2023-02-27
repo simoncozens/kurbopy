@@ -6,8 +6,6 @@ use pyo3::types::PyType;
 use kurbo::{Rect as KRect, Shape};
 use pyo3::prelude::*;
 
-use pyo3::PyNumberProtocol;
-
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A rectangle.
@@ -277,16 +275,14 @@ impl Rect {
     fn bounding_box(&self) -> Rect {
         self.0.bounding_box().into()
     }
-}
 
-#[pyproto]
-impl PyNumberProtocol for Rect {
-    fn __add__(lhs: Self, rhs: Vec2) -> PyResult<Rect> {
-        let p: Rect = (lhs.0 + rhs.0).into();
+    fn __add__(&self, rhs: &Vec2) -> PyResult<Rect> {
+        let p: Rect = (self.0 + rhs.0).into();
         Ok(p)
     }
-    fn __sub__(lhs: Self, rhs: Vec2) -> PyResult<Rect> {
-        let p: Rect = (lhs.0 - rhs.0).into();
+
+    fn __sub__(&self, rhs: &Vec2) -> PyResult<Rect> {
+        let p: Rect = (self.0 - rhs.0).into();
         Ok(p)
     }
 }

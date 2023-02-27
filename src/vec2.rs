@@ -2,7 +2,6 @@ use crate::point::Point;
 use kurbo::Vec2 as KVec2;
 use pyo3::prelude::*;
 use pyo3::types::PyType;
-use pyo3::PyNumberProtocol;
 
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
@@ -166,29 +165,27 @@ impl Vec2 {
     fn set_y(&mut self, y: f64) {
         self.0.y = y;
     }
-}
 
-#[pyproto]
-impl PyNumberProtocol for Vec2 {
-    fn __add__(lhs: Vec2, rhs: Vec2) -> PyResult<Vec2> {
-        Ok((lhs.0 + rhs.0).into())
+    fn __add__(&self, rhs: Self) -> PyResult<Self> {
+        Ok((self.0 + rhs.0).into())
     }
 
-    fn __iadd__(&mut self, other: Vec2) -> PyResult<()> {
+    fn __iadd__(&mut self, other: Self) -> PyResult<()> {
         self.0 += other.0;
         Ok(())
     }
 
-    fn __truediv__(lhs: Vec2, rhs: f64) -> PyResult<Vec2> {
-        Ok((lhs.0 / rhs).into())
+    fn __truediv__(&self, rhs: f64) -> PyResult<Self> {
+        Ok((self.0 / rhs).into())
     }
 
     fn __itruediv__(&mut self, rhs: f64) -> PyResult<()> {
         self.0 /= rhs;
         Ok(())
     }
-    fn __mul__(lhs: Vec2, rhs: f64) -> PyResult<Vec2> {
-        Ok((lhs.0 * rhs).into())
+
+    fn __mul__(&self, rhs: f64) -> PyResult<Self> {
+        Ok((self.0 * rhs).into())
     }
 
     fn __imul__(&mut self, rhs: f64) -> PyResult<()> {
@@ -196,14 +193,15 @@ impl PyNumberProtocol for Vec2 {
         Ok(())
     }
 
-    fn __neg__(&self) -> PyResult<Vec2> {
+    fn __neg__(&self) -> PyResult<Self> {
         Ok((-self.0).into())
     }
-    fn __sub__(lhs: Vec2, rhs: Vec2) -> PyResult<Vec2> {
-        Ok((lhs.0 - rhs.0).into())
+
+    fn __sub__(&self, rhs: Self) -> PyResult<Self> {
+        Ok((self.0 - rhs.0).into())
     }
 
-    fn __isub__(&mut self, other: Vec2) -> PyResult<()> {
+    fn __isub__(&mut self, other: Self) -> PyResult<()> {
         self.0 -= other.0;
         Ok(())
     }

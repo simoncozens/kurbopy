@@ -1,11 +1,11 @@
 [package]
 name = "kurbopy"
-version = "0.8.32"
+version = "0.9.0"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2021"
 
 [dependencies]
-kurbo = { version = "0.8.3" }
+kurbo = { version = "0.9.0" }
 pyo3 = { version = "^0.18", features = ["extension-module", "abi3-py37"] }
 itertools = "0.10.3"
 

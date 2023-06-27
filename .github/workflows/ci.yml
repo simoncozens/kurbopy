@@ -25,7 +25,7 @@ jobs:
           args: --release --out dist
           manylinux: auto
       - name: Install and test built wheel
-        if: matrix.target != "aarch64"
+        if: matrix.target != 'aarch64'
         run: |
           pip install dist/*.whl --force-reinstall
           pip install pytest

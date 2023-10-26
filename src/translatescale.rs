@@ -61,13 +61,13 @@ impl TranslateScale {
     /// Create a new transformation with translation only.
     #[pyo3(text_signature = "(cls, vec2)")]
     fn translate(_cls: &PyType, t: Vec2) -> Self {
-        TranslateScale(KTranslateScale::translate(t.into()))
+        TranslateScale(KTranslateScale::translate(t))
     }
 
     /// Decompose transformation into translation and scale.
     fn as_tuple(&self) -> (Vec2, f64) {
-        let t = self.0.as_tuple();
-        (t.0.into(), t.1)
+        let t = self.0;
+        (t.translation.into(), t.scale)
     }
 
     /// Compute the inverse transform.

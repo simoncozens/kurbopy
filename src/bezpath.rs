@@ -1,11 +1,20 @@
+use crate::affine::Affine;
+use crate::cubicbez::CubicBez;
 use crate::line::Line;
+use crate::pathel::PathEl;
+use crate::pathseg::PathSeg;
 use crate::point::Point;
+use crate::quadbez::QuadBez;
 use crate::rect::Rect;
 use core::cmp::Ordering;
 use itertools::Itertools;
-use kurbo::{Affine, BezPath as KBezPath, CubicBez, Vec2};
-use kurbo::{ParamCurve, PathEl, PathSeg, Shape};
+use kurbo::{
+    Affine as KAffine, BezPath as KBezPath, CubicBez as KCubicBez, ParamCurve, PathEl as KPathEl,
+    PathSeg as KPathSeg, Shape, Vec2,
+};
 use pyo3::prelude::*;
+use std::borrow::BorrowMut;
+use std::sync::{Arc, Mutex, MutexGuard};
 
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
@@ -57,74 +66,140 @@ use pyo3::prelude::*;
 ///
 /// .. _A Primer on Bézier Curves: https://pomax.github.io/bezierinfo/
 /// .. _``intersections``: PathSeg::intersections
-pub struct BezPath(pub KBezPath);
+pub struct BezPath {
+    _path: Arc<Mutex<KBezPath>>,
+}
 
 impl From<KBezPath> for BezPath {
     fn from(p: KBezPath) -> Self {
-        Self(p)
+        Self {
+            _path: Arc::new(Mutex::new(p)),
+        }
     }
 }
+
+impl BezPath {
+    pub(crate) fn path_mut(&mut self) -> MutexGuard<KBezPath> {
+        self._path.borrow_mut().lock().unwrap()
+    }
+
+    pub(crate) fn path(&self) -> MutexGuard<KBezPath> {
+        self._path.lock().unwrap()
+    }
+}
+
 #[pymethods]
 impl BezPath {
     #[new]
     fn __new__() -> Self {
-        BezPath(KBezPath::new())
+        BezPath {
+            _path: Arc::new(Mutex::new(KBezPath::new())),
+        }
     }
+
+    /// Removes the last [`PathEl`] from the path and returns it, or `None` if the path is empty.
+    pub fn pop(&mut self) -> Option<PathEl> {
+        self.path_mut().pop().map(|p| p.into())
+    }
+
+    /// Push a generic path element onto the path.
+    pub fn push(&mut self, el: PathEl) {
+        self.path_mut().push(el.0);
+    }
+
     /// Push a "move to" element onto the path.
     #[pyo3(text_signature = "($self, pt)")]
     fn move_to(&mut self, p: Point) {
-        self.0.move_to(p.0)
+        self.path_mut().move_to(p.0);
     }
     /// Push a "line to" element onto the path.
     #[pyo3(text_signature = "($self, pt)")]
     fn line_to(&mut self, p: Point) {
-        self.0.line_to(p.0)
+        self.path_mut().line_to(p.0)
     }
     /// Push a "quad to" element onto the path.
     #[pyo3(text_signature = "($self, pt1, pt2)")]
     fn quad_to(&mut self, p1: Point, p2: Point) {
-        self.0.quad_to(p1.0, p2.0)
+        self.path_mut().quad_to(p1.0, p2.0)
     }
     /// Push a "curve to" element onto the path.
     #[pyo3(text_signature = "($self, pt1, pt2, pt3)")]
     fn curve_to(&mut self, p1: Point, p2: Point, p3: Point) {
-        self.0.curve_to(p1.0, p2.0, p3.0)
+        self.path_mut().curve_to(p1.0, p2.0, p3.0)
     }
     /// Push a "close path" element onto the path.
     fn close_path(&mut self) {
-        self.0.close_path();
+        self.path_mut().close_path();
     }
-    // iter
-    // segments
+
+    /// Shorten the path, keeping the first `len`` elements.
+    fn truncate(&mut self, len: usize) {
+        self.path_mut().truncate(len);
+    }
+
     /// Flatten the path, returning a list of points.
     fn flatten(&mut self, tolerance: f64) -> Vec<Point> {
         let mut v = vec![];
-        self.0.flatten(tolerance, |l| match l {
-            PathEl::MoveTo(p) => v.push(p.into()),
-            PathEl::LineTo(p) => v.push(p.into()),
+        self.path().flatten(tolerance, |l| match l {
+            KPathEl::MoveTo(p) => v.push(p.into()),
+            KPathEl::LineTo(p) => v.push(p.into()),
             _ => {}
         });
         v
     }
+
+    /// Get the segment at the given element index.
+    ///
+    /// If you need to access all segments, [`segments`] provides a better
+    /// API. This is intended for random access of specific elements, for clients
+    /// that require this specifically.
+    ///
+    /// **note**: This returns the segment that ends at the provided element
+    /// index. In effect this means it is *1-indexed*: since no segment ends at
+    /// the first element (which is presumed to be a `MoveTo`) `get_seg(0)` will
+    /// always return `None`.
+    fn get_seg(&self, ix: usize) -> Option<PathSeg> {
+        self.path().get_seg(ix).map(|p| p.into())
+    }
+
     /// Returns `true` if the path contains no segments.
     fn is_empty(&self) -> bool {
-        self.0.is_empty()
+        self.path().is_empty()
     }
-    // apply_affine
+
+    /// Apply an affine transform to the path.
+    fn apply_affine(&mut self, affine: Affine) {
+        self.path_mut().apply_affine(affine.0)
+    }
+
     /// Is this path finite?
     fn is_finite(&self) -> bool {
-        self.0.is_finite()
+        self.path().is_finite()
     }
     /// Is this path NaN?
     fn is_nan(&self) -> bool {
-        self.0.is_nan()
+        self.path().is_nan()
     }
+
+    /// Returns a rectangle that conservatively encloses the path.
+    ///
+    /// Unlike the `bounding_box` method, this uses control points directly
+    /// rather than computing tight bounds for curve elements.
+    pub fn control_box(&self) -> Rect {
+        self.path().control_box().into()
+    }
+
+    /// Returns a new path with the winding direction of all subpaths reversed.
+    pub fn reverse_subpaths(&self) -> BezPath {
+        self.path().reverse_subpaths().into()
+    }
+
     /// Convert the path to an SVG path string representation.
     ///
     /// The current implementation doesn't take any special care to produce a
     /// short string (reducing precision, using relative movement).
     fn to_svg(&self) -> String {
-        self.0.to_svg()
+        self.path().to_svg()
     }
 
     /// Compute the signed area under the curve.
@@ -140,13 +215,13 @@ impl BezPath {
     /// curves, it's probably best to subdivide to cubics. We leave that
     /// to the caller, which is why we don't give an accuracy param here.
     fn area(&self) -> f64 {
-        self.0.area()
+        self.path().area()
     }
 
     /// Total length of perimeter.
     #[pyo3(text_signature = "($self, accuracy)")]
     fn perimeter(&self, accuracy: f64) -> f64 {
-        self.0.perimeter(accuracy)
+        self.path().perimeter(accuracy)
     }
 
     /// The winding number of a point.
@@ -159,12 +234,19 @@ impl BezPath {
     /// magnitude values are also possible when the shape is more complex.
     #[pyo3(text_signature = "($self, pt)")]
     fn winding(&self, pt: Point) -> i32 {
-        self.0.winding(pt.0)
+        self.path().winding(pt.0)
     }
 
     /// The smallest rectangle that encloses the shape.
     fn bounding_box(&self) -> Rect {
-        kurbo::Shape::bounding_box(&self.0).into()
+        kurbo::Shape::bounding_box(&*self.path()).into()
+    }
+
+    /// Returns `true` if the [`Point`] is inside this shape.
+    ///
+    /// This is only meaningful for closed shapes.
+    fn contains(&self, pt: Point) -> bool {
+        self.winding(pt) != 0
     }
 
     /// Computes the intersections with a line as a list of ``Point`` objects.
@@ -174,7 +256,7 @@ impl BezPath {
     fn intersections(&self, line: &Line) -> Vec<Point> {
         // XXX Not in original kurbo
         let mut intersections: Vec<Point> = vec![];
-        for seg in self.0.segments() {
+        for seg in self.path().segments() {
             for intersect in seg.intersect_line(line.0) {
                 intersections.push(line.0.eval(intersect.line_t).into())
             }
@@ -188,18 +270,19 @@ impl BezPath {
     #[pyo3(text_signature = "($self, other)")]
     fn min_distance(&self, other: &BezPath) -> f64 {
         // XXX Not in original kurbo
-        let segs1 = self.0.segments();
+        let path = self.path();
+        let segs1 = path.segments();
         let mut best_pair: Option<(f64, kurbo::PathSeg, kurbo::PathSeg)> = None;
         for s1 in segs1 {
-            let p1 = vec![
+            let p1 = [
                 s1.eval(0.0),
                 s1.eval(0.25),
                 s1.eval(0.5),
                 s1.eval(0.75),
                 s1.eval(1.0),
             ];
-            for s2 in other.0.segments() {
-                let p2 = vec![
+            for s2 in other.path().segments() {
+                let p2 = [
                     s2.eval(0.0),
                     s2.eval(0.25),
                     s2.eval(0.5),
@@ -222,7 +305,7 @@ impl BezPath {
         }
         if let Some((_, s1, s2)) = best_pair {
             let curve1 = match s1 {
-                PathSeg::Line(_) => PathSeg::Cubic(CubicBez::new(
+                KPathSeg::Line(_) => KPathSeg::Cubic(KCubicBez::new(
                     s1.eval(0.0),
                     s1.eval(1.0 / 3.0),
                     s1.eval(2.0 / 3.0),
@@ -231,7 +314,7 @@ impl BezPath {
                 _ => s1,
             };
             let curve2 = match s2 {
-                PathSeg::Line(_) => PathSeg::Cubic(CubicBez::new(
+                KPathSeg::Line(_) => KPathSeg::Cubic(KCubicBez::new(
                     s2.eval(0.0),
                     s2.eval(1.0 / 3.0),
                     s2.eval(2.0 / 3.0),
@@ -250,8 +333,8 @@ impl BezPath {
     /// Note that this method is not in original kurbo
     #[pyo3(text_signature = "($self, other)")]
     fn intersects(&self, other: &BezPath) -> Vec<Point> {
-        let b1 = &self.0;
-        let b2 = &other.0;
+        let b1 = &self.path();
+        let b2 = &other.path();
         if b1.bounding_box().intersect(b2.bounding_box()).area() < f64::EPSILON {
             return vec![];
         }
@@ -259,18 +342,18 @@ impl BezPath {
         let mut pts1 = vec![];
         let mut pts2 = vec![];
         b1.flatten(0.1, |el| match el {
-            PathEl::MoveTo(a) => pts1.push(a),
-            PathEl::LineTo(a) => pts1.push(a),
+            KPathEl::MoveTo(a) => pts1.push(a),
+            KPathEl::LineTo(a) => pts1.push(a),
             _ => {}
         });
         b2.flatten(0.1, |el| match el {
-            PathEl::MoveTo(a) => pts2.push(a),
-            PathEl::LineTo(a) => pts2.push(a),
+            KPathEl::MoveTo(a) => pts2.push(a),
+            KPathEl::LineTo(a) => pts2.push(a),
             _ => {}
         });
         for (&la1, &la2) in pts1.iter().circular_tuple_windows() {
             for (&lb1, &lb2) in pts2.iter().circular_tuple_windows() {
-                let seg1 = PathSeg::Line(kurbo::Line::new(la1, la2));
+                let seg1 = KPathSeg::Line(kurbo::Line::new(la1, la2));
                 let seg2 = kurbo::Line::new(lb1, lb2);
                 rv.extend(
                     seg1.intersect_line(seg2)
@@ -284,13 +367,88 @@ impl BezPath {
 
     #[pyo3(text_signature = "($self, scale_factor)")]
     fn scale_path(&self, scale_factor: f64) -> BezPath {
-        let c = self.0.bounding_box().center();
+        let c = self.path().bounding_box().center();
         let c_vec = Vec2::new(c.x, c.y);
-        BezPath(
-            Affine::translate(c_vec)
-                * Affine::scale(scale_factor)
-                * Affine::translate(c_vec * -1.0)
-                * &self.0,
-        )
+        BezPath {
+            _path: Arc::new(Mutex::new(
+                KAffine::translate(c_vec)
+                    * KAffine::scale(scale_factor)
+                    * KAffine::translate(c_vec * -1.0)
+                    * &*self.path(),
+            )),
+        }
+    }
+
+    fn segments(&self) -> SegmentIterator {
+        SegmentIterator {
+            items: Arc::new(Mutex::new(self.path().clone())),
+            index: 0,
+        }
+    }
+    fn elements(&self) -> ElementIterator {
+        ElementIterator {
+            items: Arc::new(Mutex::new(self.path().clone())),
+            index: 0,
+        }
+    }
+}
+
+#[pyclass]
+struct SegmentIterator {
+    items: Arc<Mutex<KBezPath>>,
+    index: usize,
+}
+
+#[pymethods]
+impl SegmentIterator {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+    fn __next__(&mut self, py: Python) -> Option<PyObject> {
+        let item = self.items.lock().unwrap().segments().nth(self.index);
+        self.index += 1;
+        match item {
+            None => None,
+            Some(KPathSeg::Line(l)) => Some(Line::from(l).into_py(py)),
+            Some(KPathSeg::Quad(q)) => Some(QuadBez::from(q).into_py(py)),
+            Some(KPathSeg::Cubic(c)) => Some(CubicBez::from(c).into_py(py)),
+        }
+    }
+
+    fn __len__(&self) -> usize {
+        self.items.lock().unwrap().segments().count()
+    }
+
+    fn __getitem__(&self, ix: usize) -> PathSeg {
+        self.items
+            .lock()
+            .unwrap()
+            .segments()
+            .nth(ix)
+            .unwrap()
+            .into()
+    }
+}
+
+#[pyclass]
+struct ElementIterator {
+    items: Arc<Mutex<KBezPath>>,
+    index: usize,
+}
+
+#[pymethods]
+impl ElementIterator {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+    fn __next__(&mut self, py: Python) -> Option<PyObject> {
+        let path = self.items.lock().unwrap();
+        let item = path.elements().get(self.index);
+        self.index += 1;
+        item.map(|p| PathEl(*p).into_py(py))
+    }
+
+    fn __len__(&self) -> usize {
+        self.items.lock().unwrap().elements().len()
     }
 }

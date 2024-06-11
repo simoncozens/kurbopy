@@ -1,11 +1,11 @@
 use crate::cubicbez::CubicBez;
 use crate::line::Line;
+use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::rect::Rect;
-use kurbo::ParamCurveArclen;
 use kurbo::{
-    ParamCurve, ParamCurveArea, ParamCurveCurvature, ParamCurveDeriv, ParamCurveExtrema,
-    ParamCurveNearest, QuadBez as KQuadBez, Shape,
+    ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveDeriv,
+    ParamCurveExtrema, ParamCurveNearest, QuadBez as KQuadBez, Shape,
 };
 use pyo3::prelude::*;
 
@@ -104,15 +104,11 @@ impl QuadBez {
     }
 
     /// Find the position on the curve that is nearest to the given point.
-    ///
-    /// This returns a tuple ``(t, distance_sq)`` where ``t`` is
-    /// the position on the curve of the nearest point, as a parameter, and
-    /// ``distance_sq`` is the square of the distance from the nearest position on the curve
-    /// to the given point.
+    /// This returns a [`Nearest`] struct that contains information about the position.
     #[pyo3(text_signature = "($self, point, accuracy)")]
-    fn nearest(&self, p: Point, accuracy: f64) -> (f64, f64) {
+    fn nearest(&self, p: Point, accuracy: f64) -> Nearest {
         let n = self.0.nearest(p.0, accuracy);
-        (n.t, n.distance_sq)
+        n.into()
     }
 
     /// Compute the signed curvature at parameter `t`.
@@ -136,7 +132,7 @@ impl QuadBez {
     /// the derivative of a curve (mapping of param to point) is a mapping
     /// of param to vector. We choose to accept this rather than have a
     /// more complex type scheme.
-    fn deriv(&self) -> Line {
+    pub fn deriv(&self) -> Line {
         self.0.deriv().into()
     }
 

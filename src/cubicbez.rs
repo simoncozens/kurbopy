@@ -1,12 +1,12 @@
+use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::quadbez::QuadBez;
 use crate::rect::Rect;
 
 use kurbo::{
-    CubicBez as KCubicBez, ParamCurve, ParamCurveArea, ParamCurveCurvature, ParamCurveExtrema,
-    Shape,
+    CubicBez as KCubicBez, ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature,
+    ParamCurveDeriv, ParamCurveExtrema, ParamCurveNearest, Shape,
 };
-use kurbo::{ParamCurveArclen, ParamCurveDeriv, ParamCurveNearest};
 use pyo3::prelude::*;
 
 #[pyclass(subclass)]
@@ -40,7 +40,6 @@ impl CubicBez {
     fn to_quads(&self, accuracy: f64) -> Vec<(f64, f64, QuadBez)> {
         self.0
             .to_quads(accuracy)
-            .into_iter()
             .map(|(a, b, c)| (a, b, c.into()))
             .collect()
     }
@@ -116,14 +115,11 @@ impl CubicBez {
 
     /// Find the position on the curve that is nearest to the given point.
     ///
-    /// This returns a tuple ``(t, distance_sq)`` where ``t`` is
-    /// the position on the curve of the nearest point, as a parameter, and
-    /// ``distance_sq`` is the square of the distance from the nearest position on the curve
-    /// to the given point.
+    /// This returns a [`Nearest`] struct that contains information about the position.
     #[pyo3(text_signature = "($self, point, accuracy)")]
-    fn nearest(&self, p: Point, accuracy: f64) -> (f64, f64) {
+    fn nearest(&self, p: Point, accuracy: f64) -> Nearest {
         let n = self.0.nearest(p.0, accuracy);
-        (n.t, n.distance_sq)
+        n.into()
     }
 
     /// Compute the signed curvature at parameter `t`.
@@ -147,7 +143,7 @@ impl CubicBez {
     /// the derivative of a curve (mapping of param to point) is a mapping
     /// of param to vector. We choose to accept this rather than have a
     /// more complex type scheme.
-    fn deriv(&self) -> QuadBez {
+    pub fn deriv(&self) -> QuadBez {
         self.0.deriv().into()
     }
 

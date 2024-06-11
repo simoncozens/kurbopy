@@ -1,25 +1,25 @@
 from kurbopy import Point, CubicBez
 import math
 
+
 def test_cubicbez_deriv():
     c = CubicBez(
         Point(0.0, 0.0),
         Point(1.0 / 3.0, 0.0),
         Point(2.0 / 3.0, 1.0 / 3.0),
         Point(1.0, 1.0),
-    );
-    deriv = c.deriv();
+    )
+    deriv = c.deriv()
 
-    n = 10;
+    n = 10
     for i in range(1, n):
-        t = 1/(i*n)
+        t = 1 / (i * n)
         delta = 1e-6
         p = c.eval(t)
         p1 = c.eval(t + delta)
-        d_approx = (p1.to_vec2() - p.to_vec2()) * (1/delta)
+        d_approx = (p1.to_vec2() - p.to_vec2()) * (1 / delta)
         d = deriv.eval(t).to_vec2()
         assert (d - d_approx).hypot() < delta * 2.0
-
 
 
 def test_cubicbez_arclen():
@@ -29,13 +29,12 @@ def test_cubicbez_arclen():
         Point(1.0 / 3.0, 0.0),
         Point(2.0 / 3.0, 1.0 / 3.0),
         Point(1.0, 1.0),
-    );
+    )
     true_arclen = 0.5 * math.sqrt(5.0) + 0.25 * math.log(2.0 + math.sqrt(5.0))
     for i in range(0, 12):
-        accuracy = 0.1 ** i
+        accuracy = 0.1**i
         error = c.arclen(accuracy) - true_arclen
         assert abs(error) < accuracy
-
 
 
 # def test_cubicbez_inv_arclen():
@@ -61,8 +60,8 @@ def test_cubicbez_arclen():
 #                 actual_arc,
 #                 arc
 #             );
-        
-    
+
+
 #     // corner case: user passes accuracy larger than total arc length
 #     accuracy = true_arclen * 1.1;
 #     arc = true_arclen * 0.5;
@@ -75,7 +74,6 @@ def test_cubicbez_arclen():
 #         actual_arc,
 #         arc
 #     );
-
 
 
 # def test_cubicbez_signed_area_linear():
@@ -93,7 +91,6 @@ def test_cubicbez_arclen():
 #     assert!(((Affine::translate((1.0, 0.0)) * c).signed_area() - 1.0).abs() < epsilon);
 
 
-
 # def test_cubicbez_signed_area():
 #     // y = 1 - x^3
 #     c = CubicBez::new((1.0, 0.0), (2.0 / 3.0, 1.0), (1.0 / 3.0, 1.0), (0.0, 1.0));
@@ -104,7 +101,6 @@ def test_cubicbez_arclen():
 #     assert!(((Affine::translate((1.0, 0.0)) * c).signed_area() - 1.25).abs() < epsilon);
 
 
-
 # def test_cubicbez_nearest():
 #     fn verify(result: Nearest, expected: f64) {
 #         assert!(
@@ -113,7 +109,7 @@ def test_cubicbez_arclen():
 #             result,
 #             expected
 #         );
-    
+
 #     // y = x^3
 #     c = CubicBez::new((0.0, 0.0), (1.0 / 3.0, 0.0), (2.0 / 3.0, 0.0), (1.0, 1.0));
 #     verify(c.nearest((0.1, 0.001).into(), 1e-6), 0.1);
@@ -140,17 +136,15 @@ def test_cubicbez_arclen():
 #     assert_eq!(quads.len(), 1, "{:?", &quads);
 
 
-
 def test_cubicbez_extrema():
-    q = CubicBez(Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 1.0), Point(1.0, 0.0));
+    q = CubicBez(Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 1.0), Point(1.0, 0.0))
     extrema = q.extrema()
     assert len(extrema) == 1
     assert abs(extrema[0] - 0.5) < 1e-6
 
-    q = CubicBez(Point(0.4, 0.5), Point(0.0, 1.0), Point(1.0, 0.0), Point(0.5, 0.4));
-    extrema = q.extrema();
+    q = CubicBez(Point(0.4, 0.5), Point(0.0, 1.0), Point(1.0, 0.0), Point(0.5, 0.4))
+    extrema = q.extrema()
     assert len(extrema) == 4
-
 
 
 # def test_cubicbez_toquads():
@@ -170,7 +164,3 @@ def test_cubicbez_extrema():
 #                 err = (p.y - p.x.powi(3)).abs();
 #                 worst = worst.max(err);
 #                 assert!(err < accuracy, "got { wanted {", err, accuracy);
-            
-        
-    
-

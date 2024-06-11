@@ -33,6 +33,7 @@ impl Vec2 {
     }
 
     #[classmethod]
+    #[allow(non_snake_case)]
     /// The vector (0, 0).
     fn ZERO(_cls: &PyType) -> Self {
         Vec2(KVec2::ZERO)

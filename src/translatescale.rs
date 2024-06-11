@@ -4,7 +4,7 @@ use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
 
-use kurbo::TranslateScale as KTranslateScale;
+use kurbo::{BezPath as KBezPath, TranslateScale as KTranslateScale};
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
@@ -91,22 +91,29 @@ impl TranslateScale {
         self.0.is_nan()
     }
 
+    #[allow(non_snake_case)]
     fn _add_Vec2(&self, rhs: Vec2) -> Self {
         (self.0 + rhs.0).into()
     }
+    #[allow(non_snake_case)]
     fn _mul_Point(&self, rhs: Point) -> Point {
         (self.0 * rhs.0).into()
     }
+    #[allow(non_snake_case)]
     fn _mul_TranslateScale(&self, rhs: TranslateScale) -> TranslateScale {
         (self.0 * rhs.0).into()
     }
+    #[allow(non_snake_case)]
     fn _mul_BezPath(&self, rhs: BezPath) -> BezPath {
-        (self.0 * rhs.0).into()
+        let p: KBezPath = rhs.path().clone();
+        (self.0 * p).into()
     }
+    #[allow(non_snake_case)]
     fn _mul_Line(&self, rhs: Line) -> PyResult<Line> {
         let p: Line = (self.0 * rhs.0).into();
         Ok(p)
     }
+    #[allow(non_snake_case)]
     fn _mul_Rect(&self, rhs: Rect) -> PyResult<Rect> {
         let p: Rect = (self.0 * rhs.0).into();
         Ok(p)

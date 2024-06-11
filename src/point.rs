@@ -156,18 +156,22 @@ impl Point {
         self.0.y = y;
     }
 
+    #[allow(non_snake_case)]
     fn _add_Vec2(&self, rhs: Vec2) -> Point {
         (self.0 + rhs.0).into()
     }
 
+    #[allow(non_snake_case)]
     fn _iadd_Vec2(&mut self, other: Vec2) {
         self.0 += other.0;
     }
 
+    #[allow(non_snake_case)]
     fn _sub_Vec2(&self, rhs: Vec2) -> Point {
         (self.0 - rhs.0).into()
     }
 
+    #[allow(non_snake_case)]
     fn _isub_Vec2(&mut self, other: Vec2) {
         self.0 -= other.0;
     }

@@ -1,10 +1,10 @@
+use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::vec2::Vec2;
 
-use kurbo::ParamCurveArclen;
 use kurbo::{
-    Line as KLine, ParamCurve, ParamCurveArea, ParamCurveCurvature, ParamCurveExtrema,
-    ParamCurveNearest,
+    Line as KLine, ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature,
+    ParamCurveDeriv, ParamCurveExtrema, ParamCurveNearest,
 };
 use pyo3::prelude::*;
 
@@ -101,14 +101,17 @@ impl Line {
 
     /// Find the position on the curve that is nearest to the given point.
     ///
-    /// This returns a tuple ``(t, distance_sq)`` where ``t`` is
-    /// the position on the curve of the nearest point, as a parameter, and
-    /// ``distance_sq`` is the square of the distance from the nearest position on the curve
-    /// to the given point.
+    /// This returns a [`Nearest`] struct that contains information about the position.
     #[pyo3(text_signature = "($self, point, accuracy)")]
-    fn nearest(&self, p: Point, accuracy: f64) -> (f64, f64) {
+    fn nearest(&self, p: Point, accuracy: f64) -> Nearest {
         let n = self.0.nearest(p.0, accuracy);
-        (n.t, n.distance_sq)
+        n.into()
+    }
+
+    pub fn deriv(&self) -> Line {
+        let pr = self.0.deriv();
+        // I could implement ConstPoint but it's a hassle
+        Line(KLine::new(pr.start(), pr.end()))
     }
 
     /// Compute the signed curvature at parameter `t`.
@@ -143,11 +146,13 @@ impl Line {
         self.0.p1 = p1.0;
     }
 
+    #[allow(non_snake_case)]
     fn _add_Vec2(&self, rhs: Vec2) -> PyResult<Line> {
         let p: Line = (self.0 + rhs.0).into();
         Ok(p)
     }
 
+    #[allow(non_snake_case)]
     fn _sub_Vec2(&self, rhs: Vec2) -> PyResult<Line> {
         let p: Line = (self.0 - rhs.0).into();
         Ok(p)

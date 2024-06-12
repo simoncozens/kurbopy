@@ -1,12 +1,12 @@
 [package]
 name = "kurbopy"
-version = "0.10.40"
+version = "0.11.0"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2021"
 rust-version = "1.65"
 
 [dependencies]
-kurbo = { version = "0.10.4" }
+kurbo = { version = "0.11.0" }
 pyo3 = { version = "^0.18", features = ["extension-module", "abi3-py37"] }
 itertools = "0.10.3"
 

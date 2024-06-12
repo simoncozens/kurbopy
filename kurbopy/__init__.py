@@ -28,21 +28,23 @@ def to_matplot(self):
     verts = []
     codes = []
     while len(svg):
-        m = re.match(r"^M(-?[\d\.]+) (-?[\d\.]+)\s*", svg)
+        m = re.match(r"^M(-?[\d\.]+)[,\s](-?[\d\.]+)\s*", svg)
         if m:
             codes.append(Path.MOVETO)
             verts.append((m[1], m[2]))
             svg = svg[len(m[0]) :]
             continue
 
-        m = re.match(r"^L(-?[\d\.]+) (-?[\d\.]+)\s*", svg)
+        m = re.match(r"^L(-?[\d\.]+)[,\s](-?[\d\.]+)\s*", svg)
         if m:
             codes.append(Path.LINETO)
             verts.append((m[1], m[2]))
             svg = svg[len(m[0]) :]
             continue
 
-        m = re.match(r"^Q(-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+)\s*", svg)
+        m = re.match(
+            r"^Q(-?[\d\.]+)[,\s](-?[\d\.]+) (-?[\d\.]+)[,\s](-?[\d\.]+)\s*", svg
+        )
         if m:
             codes.append(Path.CURVE3)
             verts.append((m[1], m[2]))
@@ -52,7 +54,7 @@ def to_matplot(self):
             continue
 
         m = re.match(
-            r"^C(-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+) (-?[\d\.]+)\s*",
+            r"^C(-?[\d\.]+)[,\s](-?[\d\.]+) (-?[\d\.]+)[,\s](-?[\d\.]+) (-?[\d\.]+)[,\s](-?[\d\.]+)\s*",
             svg,
         )
         if m:

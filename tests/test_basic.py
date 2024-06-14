@@ -7,7 +7,7 @@ def test_point_basic():
     assert p.x == 1.0
     p.y = 3.0
     assert p.y == 3.0
-    assert(str(p) == "<Point x=1.0 y=3.0>")
+    assert str(p) == "<Point x=1.0 y=3.0>"
 
 
 def test_point_lerp():
@@ -42,3 +42,15 @@ def test_ts():
     moved = ts1 * p1
     assert moved.x == 13.0
     assert moved.y == 12.0
+
+
+def test_common():
+    from kurbopy.common import solve_cubic
+
+    assert solve_cubic(0.1, 0.1, 0.5, 0.2) == [-2.378160678793357]
+
+    from kurbopy.common import solve_itp
+
+    f = lambda x: x**3 - x - 2.0
+    x = solve_itp(f, 1.0, 2.0, 1e-12, 0, 0.2, f(1.0), f(2.0))
+    assert abs(f(x)) < 6e-12

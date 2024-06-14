@@ -1,24 +1,27 @@
-from .kurbopy import Point as Point
-from .kurbopy import Rect as Rect
-from .kurbopy import Vec2 as Vec2
-from .kurbopy import Line as Line
-from .kurbopy import CubicBez as CubicBez
-from .kurbopy import QuadBez as QuadBez
-from .kurbopy import TranslateScale as TranslateScale
-from .kurbopy import BezPath as BezPath
+from .kurbopy import Affine
+from .kurbopy import Arc
+from .kurbopy import Point
+from .kurbopy import PathSeg
+from .kurbopy import Rect
+from .kurbopy import Vec2
+from .kurbopy import Line
+from .kurbopy import CubicBez
+from .kurbopy import QuadBez
+from .kurbopy import TranslateScale
+from .kurbopy import BezPath
 from fontTools.pens.basePen import BasePen
 from kurbopy.magic import magic_mul, magic_add, magic_sub
 import re
 
 
-def fromDrawable(drawable, *penArgs, **penKwargs):
+def from_drawable(drawable, *penArgs, **penKwargs):
     """Returns an *array of BezPath* from any object conforming to the pen protocol."""
     pen = BezPathCreatingPen(*penArgs, **penKwargs)
     drawable.draw(pen)
     return pen.paths
 
 
-setattr(BezPath, "fromDrawable", fromDrawable)
+setattr(BezPath, "from_drawable", from_drawable)
 
 
 def to_matplot(self):

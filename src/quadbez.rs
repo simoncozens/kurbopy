@@ -12,7 +12,6 @@ use pyo3::prelude::*;
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A single quadratic Bézier segment.
-#[pyo3(text_signature = "(p0, p1, p2)")]
 pub struct QuadBez(pub KQuadBez);
 
 impl From<KQuadBez> for QuadBez {

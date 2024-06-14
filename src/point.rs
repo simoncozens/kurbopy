@@ -5,12 +5,16 @@ use pyo3::prelude::*;
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A 2D point.
-#[pyo3(text_signature = "(x, y)")]
 pub struct Point(pub KPoint);
 
 impl From<KPoint> for Point {
     fn from(p: KPoint) -> Self {
         Self(p)
+    }
+}
+impl From<Point> for KPoint {
+    fn from(p: Point) -> Self {
+        p.0
     }
 }
 
@@ -23,7 +27,7 @@ impl Point {
     }
 
     /// Convert this point into a `Vec2`.
-    fn to_vec2(&self) -> Vec2 {
+    pub fn to_vec2(&self) -> Vec2 {
         self.0.to_vec2().into()
     }
 
@@ -176,16 +180,16 @@ impl Point {
         self.0 -= other.0;
     }
 
-    fn __add__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let magic = PyModule::import(py, "kurbopy.magic")?;
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
             magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
         })
     }
 
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let magic = PyModule::import(py, "kurbopy.magic")?;
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
             magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
         })
     }

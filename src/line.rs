@@ -11,7 +11,6 @@ use pyo3::prelude::*;
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A single line.
-#[pyo3(text_signature = "(p0, p1)")]
 pub struct Line(pub KLine);
 
 impl From<KLine> for Line {

@@ -10,7 +10,6 @@ use pyo3::types::PyType;
 /// This is intended primarily for a vector in the mathematical sense,
 /// but it can be interpreted as a translation, and converted to and
 /// from a point (vector relative to the origin) and size.
-#[pyo3(text_signature = "(x, y)")]
 pub struct Vec2(pub KVec2);
 
 impl From<KVec2> for Vec2 {
@@ -35,7 +34,7 @@ impl Vec2 {
     #[classmethod]
     #[allow(non_snake_case)]
     /// The vector (0, 0).
-    fn ZERO(_cls: &PyType) -> Self {
+    fn ZERO(_cls: &Bound<'_, PyType>) -> Self {
         Vec2(KVec2::ZERO)
     }
 
@@ -88,7 +87,7 @@ impl Vec2 {
     /// _`Affine.rotate`.
     #[classmethod]
     #[pyo3(text_signature = "(cls, th)")]
-    fn from_angle(_cls: &PyType, th: f64) -> Self {
+    fn from_angle(_cls: &Bound<'_, PyType>, th: f64) -> Self {
         KVec2::from_angle(th).into()
     }
 

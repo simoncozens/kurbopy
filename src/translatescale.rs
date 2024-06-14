@@ -34,7 +34,6 @@ use pyo3::types::PyType;
 ///
 /// This transformation is less powerful than `Affine`, but can be applied
 /// to more primitives, especially including :py:class:`Rect`.
-#[pyo3(text_signature = "(translation, scale)")]
 pub struct TranslateScale(pub KTranslateScale);
 
 impl From<KTranslateScale> for TranslateScale {
@@ -53,14 +52,14 @@ impl TranslateScale {
     #[classmethod]
     /// Create a new transformation with scale only.
     #[pyo3(text_signature = "(cls, scale)")]
-    fn scale(_cls: &PyType, scale: f64) -> Self {
+    fn scale(_cls: &Bound<PyType>, scale: f64) -> Self {
         TranslateScale(KTranslateScale::scale(scale))
     }
 
     #[classmethod]
     /// Create a new transformation with translation only.
     #[pyo3(text_signature = "(cls, vec2)")]
-    fn translate(_cls: &PyType, t: Vec2) -> Self {
+    fn translate(_cls: &Bound<PyType>, t: Vec2) -> Self {
         TranslateScale(KTranslateScale::translate(t))
     }
 
@@ -119,23 +118,23 @@ impl TranslateScale {
         Ok(p)
     }
 
-    fn __mul__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let magic = PyModule::import(py, "kurbopy.magic")?;
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
             magic.getattr("magic_mul")?.call1((slf, rhs))?.extract()
         })
     }
 
-    fn __add__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let magic = PyModule::import(py, "kurbopy.magic")?;
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
             magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
         })
     }
 
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &PyAny) -> PyResult<PyObject> {
+    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let magic = PyModule::import(py, "kurbopy.magic")?;
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
             magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
         })
     }

@@ -9,10 +9,9 @@ use kurbo::{
 };
 use pyo3::prelude::*;
 
-#[pyclass(subclass)]
 #[derive(Clone, Debug)]
+#[pyclass(subclass)]
 /// A single cubic Bézier segment.
-#[pyo3(text_signature = "(p0, p1, p2, p3)")]
 pub struct CubicBez(pub KCubicBez);
 
 impl From<KCubicBez> for CubicBez {

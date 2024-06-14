@@ -9,7 +9,6 @@ use pyo3::prelude::*;
 #[pyclass(subclass)]
 #[derive(Clone, Debug)]
 /// A rectangle.
-#[pyo3(text_signature = "(l, t, r, b)")]
 pub struct Rect(pub KRect);
 
 impl From<KRect> for Rect {
@@ -29,17 +28,17 @@ impl Rect {
     ///
     /// The result will have non-negative width and height.
     #[pyo3(text_signature = "(cls, p0, p1)")]
-    fn from_points(_: &PyType, p0: Point, p1: Point) -> Rect {
+    fn from_points(_cls: &Bound<'_, PyType>, p0: Point, p1: Point) -> Rect {
         Rect(KRect::from_points(p0.0, p1.0))
     }
 
     // #[classmethod]
-    // fn from_origin_size(_: &PyType, p0: Point, p1: Size) -> Self {
+    // fn from_origin_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
     //     Rect(KRect::from_origin_size(p0.0, p1.0))
     // }
 
     // #[classmethod]
-    // fn from_center_size(_: &PyType, p0: Point, p1: Size) -> Self {
+    // fn from_center_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
     //     Rect(KRect::from_center_size(p0.0, p1.0))
     // }
 

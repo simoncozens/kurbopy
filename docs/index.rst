@@ -12,6 +12,7 @@ performance in high-accuracy conditions".
 
    common
    affine
+   arc
    point
    vec2
    line

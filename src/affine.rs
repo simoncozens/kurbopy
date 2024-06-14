@@ -14,7 +14,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyType;
 
 /// A 2D affine transform.
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct Affine(pub KAffine);
 

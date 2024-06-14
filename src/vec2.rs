@@ -3,7 +3,7 @@ use kurbo::Vec2 as KVec2;
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A 2D vector.
 ///

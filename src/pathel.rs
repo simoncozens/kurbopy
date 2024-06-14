@@ -1,7 +1,7 @@
 use kurbo::PathEl as KPathEl;
 use pyo3::prelude::*;
 
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct PathEl(pub KPathEl);
 

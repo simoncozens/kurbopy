@@ -16,7 +16,7 @@ use pyo3::prelude::*;
 use std::borrow::BorrowMut;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A Bézier path.
 ///

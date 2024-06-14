@@ -6,7 +6,7 @@ use pyo3::types::PyType;
 use kurbo::{Rect as KRect, Shape};
 use pyo3::prelude::*;
 
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A rectangle.
 pub struct Rect(pub KRect);

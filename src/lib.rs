@@ -1,4 +1,5 @@
 mod affine;
+mod arc;
 mod bezpath;
 mod common;
 mod cubicbez;
@@ -18,6 +19,7 @@ use pyo3::prelude::*;
 fn kurbopy(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     register_child_module(m)?;
     m.add_class::<affine::Affine>()?;
+    m.add_class::<arc::Arc>()?;
     m.add_class::<bezpath::BezPath>()?;
     m.add_class::<cubicbez::CubicBez>()?;
     m.add_class::<line::Line>()?;

@@ -9,7 +9,7 @@ use kurbo::{
 };
 use pyo3::prelude::*;
 
-#[pyclass(subclass)]
+#[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A single quadratic Bézier segment.
 pub struct QuadBez(pub KQuadBez);

@@ -52,4 +52,30 @@ impl Arc {
         };
         self.0.to_cubic_beziers(tolerance, callback)
     }
+
+    /// The area of the arc.
+    ///
+    /// Note: shape isn't closed so area is not well defined.
+    fn area(&self) -> f64 {
+        self.0.area()
+    }
+
+    /// The perimeter of the arc.
+    ///
+    /// For we just approximate by using the bezier curve representation.
+    fn perimeter(&self, accuracy: f64) -> f64 {
+        self.0.perimeter(accuracy)
+    }
+
+    ///The winding number of a point.
+    ///
+    /// Note: shape isn't closed, so a point's winding number is not well defined.
+    fn winding(&self, pt: Point) -> i32 {
+        self.0.winding(pt.0)
+    }
+
+    /// The smallest rectangle that encloses the shape.
+    fn bounding_box(&self) -> Rect {
+        self.0.bounding_box().into()
+    }
 }

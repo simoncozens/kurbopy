@@ -1,3 +1,4 @@
+use crate::arc::Arc;
 use crate::bezpath::BezPath;
 use crate::cubicbez::CubicBez;
 use crate::line::Line;
@@ -289,10 +290,10 @@ impl Affine {
         Affine(self.0.mul(rhs.0))
     }
 
-    // #[allow(non_snake_case)]
-    // fn _mul_Arc(&self, rhs: &Arc) -> Arc {
-    //     self.0.mul(rhs.0).into()
-    // }
+    #[allow(non_snake_case)]
+    fn _mul_Arc(&self, rhs: &Arc) -> Arc {
+        self.0.mul(rhs.0).into()
+    }
 
     // #[allow(non_snake_case)]
     // fn _mul_Circle(&self, rhs: &Circle) -> Circle {

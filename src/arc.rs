@@ -1,13 +1,9 @@
-use crate::nearest::Nearest;
+use crate::{bezpath::BezPath, impl_shape};
 use crate::point::Point;
-use crate::quadbez::QuadBez;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
 
-use kurbo::{
-    Arc as KArc, ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature,
-    ParamCurveDeriv, ParamCurveExtrema, ParamCurveNearest, Point as KPoint, Shape,
-};
+use kurbo::{Arc as KArc, Point as KPoint, Shape};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
@@ -41,6 +37,47 @@ impl Arc {
         ))
     }
 
+    #[getter]
+    pub fn get_center(&self) -> Point {
+        self.0.center.into()
+    }
+    #[setter]
+    pub fn set_center(&mut self, center: Point) {
+        self.0.center = center.0
+    }
+    #[getter]
+    pub fn get_radii(&self) -> Vec2 {
+        self.0.radii.into()
+    }
+    #[setter]
+    pub fn set_radii(&mut self, radii: Vec2) {
+        self.0.radii = radii.0
+    }
+    #[getter]
+    pub fn get_start_angle(&self) -> f64 {
+        self.0.start_angle
+    }
+    #[setter]
+    pub fn set_start_angle(&mut self, start_angle: f64) {
+        self.0.start_angle = start_angle
+    }
+    #[getter]
+    pub fn get_sweep_angle(&self) -> f64 {
+        self.0.sweep_angle
+    }
+    #[setter]
+    pub fn set_sweep_angle(&mut self, sweep_angle: f64) {
+        self.0.sweep_angle = sweep_angle
+    }
+    #[getter]
+    pub fn get_x_rotation(&self) -> f64 {
+        self.0.x_rotation
+    }
+    #[setter]
+    pub fn set_x_rotation(&mut self, x_rotation: f64) {
+        self.0.x_rotation = x_rotation
+    }
+
     /// Converts an Arc into a series of cubic bezier segments.
     ///
     /// Closure will be invoked for each segment.
@@ -52,30 +89,6 @@ impl Arc {
         };
         self.0.to_cubic_beziers(tolerance, callback)
     }
-
-    /// The area of the arc.
-    ///
-    /// Note: shape isn't closed so area is not well defined.
-    fn area(&self) -> f64 {
-        self.0.area()
-    }
-
-    /// The perimeter of the arc.
-    ///
-    /// For we just approximate by using the bezier curve representation.
-    fn perimeter(&self, accuracy: f64) -> f64 {
-        self.0.perimeter(accuracy)
-    }
-
-    ///The winding number of a point.
-    ///
-    /// Note: shape isn't closed, so a point's winding number is not well defined.
-    fn winding(&self, pt: Point) -> i32 {
-        self.0.winding(pt.0)
-    }
-
-    /// The smallest rectangle that encloses the shape.
-    fn bounding_box(&self) -> Rect {
-        self.0.bounding_box().into()
-    }
 }
+
+impl_shape!(Arc);

@@ -7,7 +7,7 @@ rust-version = "1.65"
 
 [dependencies]
 kurbo = { version = "0.11.0" }
-pyo3 = { version = "^0.21.2", features = ["extension-module", "abi3-py37"] }
+pyo3 = { version = "^0.21.2", features = ["extension-module", "abi3-py37", "multiple-pymethods"] }
 itertools = "0.10.3"
 
 [lib]

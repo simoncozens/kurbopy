@@ -2,6 +2,11 @@ use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::quadbez::QuadBez;
 use crate::rect::Rect;
+use crate::{
+    impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea,
+    impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest,
+    impl_shape_no_bounding_box,
+};
 
 use kurbo::{
     CubicBez as KCubicBez, ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature,
@@ -42,148 +47,15 @@ impl CubicBez {
             .map(|(a, b, c)| (a, b, c.into()))
             .collect()
     }
-
-    /// Is this cubic Bezier curve finite?
-    fn is_finite(&self) -> bool {
-        self.0.is_finite()
-    }
-    /// Is this cubic Bezier curve NaN?
-    fn is_nan(&self) -> bool {
-        self.0.is_nan()
-    }
-
-    /// Evaluate the curve at parameter `t`.
+    /// Determine the inflection points.
     ///
-    /// Generally `t` is in the range [0..1].
-    #[pyo3(text_signature = "($self, t)")]
-    fn eval(&self, t: f64) -> Point {
-        self.0.eval(t).into()
-    }
-    /// The start point.
-    fn start(&self) -> Point {
-        self.0.start().into()
-    }
-    /// The end point.
-    fn end(&self) -> Point {
-        self.0.end().into()
-    }
-    /// Get a subsegment of the curve for the given parameter range.
-    #[pyo3(text_signature = "($self, (t0,t1))")]
-    fn subsegment(&self, range: (f64, f64)) -> Self {
-        self.0.subsegment(range.0..range.1).into()
-    }
-
-    /// The arc length of the curve.
+    /// Return value is t parameter for the inflection points of the curve segment.
+    /// There are a maximum of two for a cubic Bézier.
     ///
-    /// The result is accurate to the given accuracy (subject to
-    /// roundoff errors for ridiculously low values). Compute time
-    /// may vary with accuracy, if the curve needs to be subdivided.
-    #[pyo3(text_signature = "($self, accuracy)")]
-    fn arclen(&self, accuracy: f64) -> f64 {
-        self.0.arclen(accuracy)
-    }
-
-    /// Solve for the parameter that has the given arc length from the start.
-    ///
-    /// This implementation uses the IPT method, as provided by
-    /// [`common::solve_itp`]. This is as robust as bisection but
-    /// typically converges faster. In addition, the method takes
-    /// care to compute arc lengths of increasingly smaller segments
-    /// of the curve, as that is likely faster than repeatedly
-    /// computing the arc length of the segment starting at t=0.
-    #[pyo3(text_signature = "($self, arclen, accuracy)")]
-    fn inv_arclen(&self, arclen: f64, accuracy: f64) -> f64 {
-        self.0.inv_arclen(arclen, accuracy)
-    }
-
-    /// Compute the signed area under the curve.
-    ///
-    /// For a closed path, the signed area of the path is the sum of signed
-    /// areas of the segments. This is a variant of the "shoelace formula."
-    /// See:
-    /// _<https://github.com/Pomax/bezierinfo/issues/44> and
-    /// _<http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html>
-    ///
-    /// This can be computed exactly for Béziers thanks to Green's theorem,
-    /// and also for simple curves such as circular arcs. For more exotic
-    /// curves, it's probably best to subdivide to cubics. We leave that
-    /// to the caller, which is why we don't give an accuracy param here.
-    fn signed_area(&self) -> f64 {
-        self.0.signed_area()
-    }
-
-    /// Find the position on the curve that is nearest to the given point.
-    ///
-    /// This returns a [`Nearest`] struct that contains information about the position.
-    #[pyo3(text_signature = "($self, point, accuracy)")]
-    fn nearest(&self, p: Point, accuracy: f64) -> Nearest {
-        let n = self.0.nearest(p.0, accuracy);
-        n.into()
-    }
-
-    /// Compute the signed curvature at parameter `t`.
-    #[pyo3(text_signature = "($self, t)")]
-    fn curvature(&self, t: f64) -> f64 {
-        self.0.curvature(t)
-    }
-
-    /// Compute the extrema of the curve.
-    ///
-    /// Only extrema within the interior of the curve count.
-    ///
-    /// The extrema should be reported in increasing parameter order.
-    fn extrema(&self) -> Vec<f64> {
-        self.0.extrema().to_vec()
-    }
-
-    /// The derivative of the curve.
-    ///
-    /// Note that the type of the return value is somewhat inaccurate, as
-    /// the derivative of a curve (mapping of param to point) is a mapping
-    /// of param to vector. We choose to accept this rather than have a
-    /// more complex type scheme.
-    pub fn deriv(&self) -> QuadBez {
-        self.0.deriv().into()
-    }
-
-    /// Compute the signed area under the curve.
-    ///
-    /// For a closed path, the signed area of the path is the sum of signed
-    /// areas of the segments. This is a variant of the "shoelace formula."
-    /// See:
-    /// <https://github.com/Pomax/bezierinfo/issues/44> and
-    /// <http://ich.deanmcnamee.com/graphics/2016/03/30/CurveArea.html>
-    ///
-    /// This can be computed exactly for Béziers thanks to Green's theorem,
-    /// and also for simple curves such as circular arcs. For more exotic
-    /// curves, it's probably best to subdivide to cubics. We leave that
-    /// to the caller, which is why we don't give an accuracy param here.
-    fn area(&self) -> f64 {
-        self.0.area()
-    }
-
-    /// Total length of perimeter.
-    #[pyo3(text_signature = "($self, accuracy)")]
-    fn perimeter(&self, accuracy: f64) -> f64 {
-        self.0.perimeter(accuracy)
-    }
-
-    /// The winding number of a point.
-    ///
-    /// This method only produces meaningful results with closed shapes.
-    ///
-    /// The sign of the winding number is consistent with that of ``area``,
-    /// meaning it is +1 when the point is inside a positive area shape
-    /// and -1 when it is inside a negative area shape. Of course, greater
-    /// magnitude values are also possible when the shape is more complex.
-    #[pyo3(text_signature = "($self, pt)")]
-    fn winding(&self, pt: Point) -> i32 {
-        self.0.winding(pt.0)
-    }
-
-    /// The smallest rectangle that encloses the shape.
-    fn bounding_box(&self) -> Rect {
-        kurbo::Shape::bounding_box(&self.0).into()
+    /// See <https://www.caffeineowl.com/graphics/2d/vectorial/cubic-inflexion.html>
+    /// for the theory.
+    pub fn inflections(&self) -> Vec<f64> {
+        self.0.inflections().to_vec()
     }
 
     #[getter]
@@ -219,3 +91,12 @@ impl CubicBez {
         self.0.p3 = p3.0;
     }
 }
+impl_isfinitenan!(CubicBez);
+impl_paramcurve!(CubicBez);
+impl_paramcurvearclen!(CubicBez);
+impl_paramcurvearea!(CubicBez);
+impl_paramcurvecurvature!(CubicBez);
+impl_paramcurvederiv!(CubicBez, QuadBez);
+impl_paramcurveextrema!(CubicBez);
+impl_paramcurvenearest!(CubicBez);
+impl_shape_no_bounding_box!(CubicBez);

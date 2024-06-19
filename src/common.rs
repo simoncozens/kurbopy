@@ -133,3 +133,20 @@ pub fn solve_quadratic(c0: f64, c1: f64, c2: f64) -> Vec<f64> {
 pub fn solve_quartic(c0: f64, c1: f64, c2: f64, c3: f64, c4: f64) -> Vec<f64> {
     common::solve_quartic(c0, c1, c2, c3, c4).to_vec()
 }
+
+#[macro_export]
+macro_rules! impl_isfinitenan {
+    ($name:ident) => {
+        #[pymethods]
+        impl $name {
+            /// Is this value finite?
+            fn is_finite(&self) -> bool {
+                self.0.is_finite()
+            }
+            /// Is this value NaN?
+            fn is_nan(&self) -> bool {
+                self.0.is_nan()
+            }
+        }
+    };
+}

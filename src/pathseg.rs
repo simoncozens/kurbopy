@@ -5,7 +5,7 @@ use crate::point::Point;
 use crate::quadbez::QuadBez;
 use kurbo::{
     ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveNearest,
-    PathSeg as KPathSeg,
+    PathSeg as KPathSeg, LineIntersection as KLineIntersection
 };
 use pyo3::prelude::*;
 
@@ -80,5 +80,27 @@ impl PathSeg {
             KPathSeg::Quad(quad) => QuadBez(quad).deriv().into_py(py),
             KPathSeg::Cubic(cubic) => CubicBez(cubic).deriv().into_py(py),
         }
+    }
+}
+
+#[pyclass(subclass, module = "kurbopy")]
+#[derive(Clone, Debug)]
+pub struct LineIntersection(pub KLineIntersection);
+
+impl From<KLineIntersection> for LineIntersection {
+    fn from(p: KLineIntersection) -> Self {
+        Self(p)
+    }
+}
+
+#[pymethods]
+impl LineIntersection {
+    #[getter]
+    fn line_t(&self) -> f64 {
+        self.0.line_t
+    }
+    #[getter]
+    fn segment_t(&self) -> f64 {
+        self.0.segment_t
     }
 }

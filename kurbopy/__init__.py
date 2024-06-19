@@ -1,14 +1,36 @@
 from .kurbopy import Affine
 from .kurbopy import Arc
-from .kurbopy import Point
-from .kurbopy import PathSeg
-from .kurbopy import Rect
-from .kurbopy import Vec2
-from .kurbopy import Line
-from .kurbopy import CubicBez
-from .kurbopy import QuadBez
-from .kurbopy import TranslateScale
 from .kurbopy import BezPath
+from .kurbopy import Circle
+from .kurbopy import CircleSegment
+from .kurbopy import ConstPoint
+from .kurbopy import CubicBez
+
+# CurveFitSample XXX
+from .kurbopy import Ellipse
+from .kurbopy import Insets
+from .kurbopy import Line
+from .kurbopy import LineIntersection
+
+# MinDistance XXX
+from .kurbopy import Nearest
+from .kurbopy import PathEl
+from .kurbopy import PathSeg
+from .kurbopy import Point
+from .kurbopy import QuadBez
+
+# QuadSpline XXX
+from .kurbopy import Rect
+# RoundedRect XXX
+# RoundedRectRadii XXX
+# Segments XXX
+from .kurbopy import Size
+
+# Stroke XXX
+# StrokeOpts XXX
+# SVGArc XXX
+from .kurbopy import TranslateScale
+from .kurbopy import Vec2
 from fontTools.pens.basePen import BasePen
 from kurbopy.magic import magic_mul, magic_add, magic_sub
 import re

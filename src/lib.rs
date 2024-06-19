@@ -1,15 +1,23 @@
 mod affine;
 mod arc;
 mod bezpath;
+mod circle;
 mod common;
+mod constpoint;
 mod cubicbez;
+mod ellipse;
+mod insets;
 mod line;
+mod magic;
 mod nearest;
+mod paramcurve;
 mod pathel;
 mod pathseg;
 mod point;
 mod quadbez;
 mod rect;
+mod shape;
+mod size;
 mod translatescale;
 mod vec2;
 
@@ -22,13 +30,19 @@ fn kurbopy(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<arc::Arc>()?;
     m.add_class::<bezpath::BezPath>()?;
     m.add_class::<cubicbez::CubicBez>()?;
+    m.add_class::<circle::Circle>()?;
+    m.add_class::<constpoint::ConstPoint>()?;
+    m.add_class::<ellipse::Ellipse>()?;
+    m.add_class::<insets::Insets>()?;
     m.add_class::<line::Line>()?;
     m.add_class::<nearest::Nearest>()?;
     m.add_class::<pathseg::PathSeg>()?;
+    m.add_class::<pathseg::LineIntersection>()?;
     m.add_class::<pathel::PathEl>()?;
     m.add_class::<point::Point>()?;
     m.add_class::<quadbez::QuadBez>()?;
     m.add_class::<rect::Rect>()?;
+    m.add_class::<size::Size>()?;
     m.add_class::<translatescale::TranslateScale>()?;
     m.add_class::<vec2::Vec2>()?;
     Ok(())

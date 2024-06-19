@@ -1,6 +1,8 @@
 use crate::arc::Arc;
 use crate::bezpath::BezPath;
+use crate::circle::Circle;
 use crate::cubicbez::CubicBez;
+use crate::ellipse::Ellipse;
 use crate::line::Line;
 use crate::pathel::PathEl;
 use crate::pathseg::PathSeg;
@@ -295,10 +297,10 @@ impl Affine {
         self.0.mul(rhs.0).into()
     }
 
-    // #[allow(non_snake_case)]
-    // fn _mul_Circle(&self, rhs: &Circle) -> Circle {
-    //     self.0.mul(rhs.0).into()
-    // }
+    #[allow(non_snake_case)]
+    fn _mul_Circle(&self, rhs: &Circle) -> Ellipse {
+        self.0.mul(rhs.0).into()
+    }
 
     #[allow(non_snake_case)]
     fn _mul_CubicBez(&self, rhs: &CubicBez) -> CubicBez {
@@ -335,10 +337,10 @@ impl Affine {
         self.0 == other.0
     }
 
-    // #[allow(non_snake_case)]
-    // fn _mul_Ellipse(&self, rhs: &Ellipse) -> Ellipse {
-    //     self.0.mul(rhs.0).into()
-    // }
+    #[allow(non_snake_case)]
+    fn _mul_Ellipse(&self, rhs: &Ellipse) -> Ellipse {
+        self.0.mul(rhs.0).into()
+    }
 
     #[allow(non_snake_case)]
     fn __rmul__(&self, rhs: f64) -> Affine {

@@ -3,6 +3,7 @@ use crate::line::Line;
 use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
+use crate::cubicbez::CubicBez;
 
 use kurbo::{BezPath as KBezPath, TranslateScale as KTranslateScale};
 use pyo3::prelude::*;
@@ -117,7 +118,11 @@ impl TranslateScale {
         let p: Rect = (self.0 * rhs.0).into();
         Ok(p)
     }
-
+    #[allow(non_snake_case)]
+    fn _mul_CubicBez(&self, rhs: CubicBez) -> PyResult<CubicBez> {
+        let p: CubicBez = (self.0 * rhs.0).into();
+        Ok(p)
+    }
     fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
             let magic = PyModule::import_bound(py, "kurbopy.magic")?;

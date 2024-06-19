@@ -13,15 +13,20 @@ performance in high-accuracy conditions".
    common
    affine
    arc
-   point
-   vec2
-   line
-   rect
-   cubicbez
-   quadbez
    bezpath
+   circle
+   constpoint
+   cubicbez
+   ellipse
+   insets
+   line
    pathseg
+   point
+   quadbez
+   rect
+   size
    translatescale
+   vec2
 
 Indices and tables
 ==================

@@ -1,5 +1,7 @@
 use crate::bezpath::BezPath;
+use crate::insets::Insets;
 use crate::point::Point;
+use crate::size::Size;
 use crate::vec2::Vec2;
 use pyo3::types::PyType;
 
@@ -23,6 +25,32 @@ impl Rect {
         Rect(KRect::new(p0, p1, p2, p3))
     }
 
+    // getters and setters
+    #[getter]
+    fn x0(&self) -> f64 {
+        self.0.x0
+    }
+    #[setter]
+    fn set_x0(&mut self, x0: f64) {
+        self.0.x0 = x0
+    }
+    #[getter]
+    fn y0(&self) -> f64 {
+        self.0.y0
+    }
+    #[setter]
+    fn set_y0(&mut self, y0: f64) {
+        self.0.y0 = y0
+    }
+    #[getter]
+    fn x1(&self) -> f64 {
+        self.0.x1
+    }
+    #[setter]
+    fn set_x1(&mut self, x1: f64) {
+        self.0.x1 = x1
+    }
+
     #[classmethod]
     /// A new rectangle from two points.
     ///
@@ -32,15 +60,15 @@ impl Rect {
         Rect(KRect::from_points(p0.0, p1.0))
     }
 
-    // #[classmethod]
-    // fn from_origin_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
-    //     Rect(KRect::from_origin_size(p0.0, p1.0))
-    // }
+    #[classmethod]
+    fn from_origin_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
+        Rect(KRect::from_origin_size(p0.0, p1.0))
+    }
 
-    // #[classmethod]
-    // fn from_center_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
-    //     Rect(KRect::from_center_size(p0.0, p1.0))
-    // }
+    #[classmethod]
+    fn from_center_size(_cls: &Bound<'_, PyType>, p0: Point, p1: Size) -> Self {
+        Rect(KRect::from_center_size(p0.0, p1.0))
+    }
 
     /// Create a new `Rect` with the same size as `self` and a new origin.
     #[pyo3(text_signature = "($self, origin)")]
@@ -48,12 +76,12 @@ impl Rect {
         self.0.with_origin(origin.0).into()
     }
 
-    // fn with_size(&self, size: Size) -> Self {
-    //     self.0.with_size(size.0).into()
-    // }
+    fn with_size(&self, size: Size) -> Self {
+        self.0.with_size(size.0).into()
+    }
 
-    fn inset(&self, inset: f64) -> Self {
-        self.0.inset(inset).into()
+    fn inset(&self, inset: Insets) -> Self {
+        self.0.inset(inset.0).into()
     }
 
     /// The width of the rectangle.
@@ -275,13 +303,70 @@ impl Rect {
         self.0.bounding_box().into()
     }
 
-    fn __add__(&self, rhs: &Vec2) -> PyResult<Rect> {
+    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
+        Python::with_gil(|py| {
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
+            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
+        })
+    }
+
+    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
+        Python::with_gil(|py| {
+            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
+            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
+        })
+    }
+
+    #[allow(non_snake_case)]
+    fn _add_Vec2(&self, rhs: &Vec2) -> PyResult<Rect> {
         let p: Rect = (self.0 + rhs.0).into();
         Ok(p)
     }
 
-    fn __sub__(&self, rhs: &Vec2) -> PyResult<Rect> {
+    #[allow(non_snake_case)]
+    fn _sub_Vec2(&self, rhs: &Vec2) -> PyResult<Rect> {
         let p: Rect = (self.0 - rhs.0).into();
         Ok(p)
+    }
+
+    #[allow(non_snake_case)]
+    fn _add_Insets(&self, rhs: &Insets) -> Rect {
+        (rhs.0 + self.0).into()
+    }
+
+    #[allow(non_snake_case)]
+    fn _sub_Rect(&self, rhs: &Rect) -> Insets {
+        (self.0 - rhs.0).into()
+    }
+
+    #[allow(non_snake_case)]
+    fn _sub_Insets(&self, rhs: &Insets) -> Rect {
+        (rhs.0 - self.0).into()
+    }
+
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use kurbo::{Insets, Rect};
+    // use super::*;
+
+    #[test]
+    fn test_kurbo_docs() {
+        let rect = Rect::new(0., 0., 5., 11.);
+        let insets = Insets::uniform_xy(1., 7.);
+
+        let inset_rect = rect + insets;
+        println!("{:?}", inset_rect);
+        let insets2 = inset_rect - rect;
+        println!("{:?}", insets2);
+
+        assert_eq!(insets2.x0, insets.x0);
+        assert_eq!(insets2.y1, insets.y1);
+        assert_eq!(insets2.x_value(), insets.x_value());
+        assert_eq!(insets2.y_value(), insets.y_value());
     }
 }

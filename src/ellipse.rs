@@ -83,30 +83,12 @@ impl Ellipse {
         Ellipse(self.0.with_rotation(rotation))
     }
 
-    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
-        })
-    }
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
-        })
-    }
-    fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_mul")?.call1((slf, rhs))?.extract()
-        })
-    }
     #[allow(non_snake_case)]
-    fn _add_Vec2(&self, rhs: Vec2) -> Ellipse {
+    fn __add__(&self, rhs: Vec2) -> Ellipse {
         Ellipse(self.0 + rhs.0)
     }
     #[allow(non_snake_case)]
-    fn _sub_Vec2(&self, rhs: Vec2) -> Ellipse {
+    fn __sub__(&self, rhs: Vec2) -> Ellipse {
         Ellipse(self.0 + rhs.0)
     }
 }

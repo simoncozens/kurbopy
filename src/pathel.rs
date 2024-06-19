@@ -1,7 +1,7 @@
 use kurbo::PathEl as KPathEl;
 use pyo3::prelude::*;
 
-use crate::{impl_isfinitenan, impl_shape, point::Point};
+use crate::{impl_isfinitenan, point::Point};
 
 #[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
@@ -14,7 +14,6 @@ impl From<KPathEl> for PathEl {
 }
 
 impl_isfinitenan!(PathEl);
-impl_shape!(PathEl);
 
 #[pymethods]
 impl PathEl {

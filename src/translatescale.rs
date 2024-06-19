@@ -4,8 +4,9 @@ use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
 use crate::cubicbez::CubicBez;
+use crate::polymorphic;
 
-use kurbo::{BezPath as KBezPath, TranslateScale as KTranslateScale};
+use kurbo::TranslateScale as KTranslateScale;
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
@@ -92,55 +93,23 @@ impl TranslateScale {
     }
 
     #[allow(non_snake_case)]
-    fn _add_Vec2(&self, rhs: Vec2) -> Self {
+    fn __add__(&self, rhs: Vec2) -> Self {
         (self.0 + rhs.0).into()
     }
-    #[allow(non_snake_case)]
-    fn _mul_Point(&self, rhs: Point) -> Point {
-        (self.0 * rhs.0).into()
-    }
-    #[allow(non_snake_case)]
-    fn _mul_TranslateScale(&self, rhs: TranslateScale) -> TranslateScale {
-        (self.0 * rhs.0).into()
-    }
-    #[allow(non_snake_case)]
-    fn _mul_BezPath(&self, rhs: BezPath) -> BezPath {
-        let p: KBezPath = rhs.path().clone();
-        (self.0 * p).into()
-    }
-    #[allow(non_snake_case)]
-    fn _mul_Line(&self, rhs: Line) -> PyResult<Line> {
-        let p: Line = (self.0 * rhs.0).into();
-        Ok(p)
-    }
-    #[allow(non_snake_case)]
-    fn _mul_Rect(&self, rhs: Rect) -> PyResult<Rect> {
-        let p: Rect = (self.0 * rhs.0).into();
-        Ok(p)
-    }
-    #[allow(non_snake_case)]
-    fn _mul_CubicBez(&self, rhs: CubicBez) -> PyResult<CubicBez> {
-        let p: CubicBez = (self.0 * rhs.0).into();
-        Ok(p)
-    }
-    fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_mul")?.call1((slf, rhs))?.extract()
-        })
-    }
 
-    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
-        })
-    }
-
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
-        })
+    // We need to define this one manually because we don't have a 
+    // newtype wrapper for BezPath.
+    #[allow(non_snake_case)]
+    fn _mul_BezPath(&self, bez: BezPath) -> BezPath {
+        (self.0 * &*bez.path()).into()
     }
 }
+
+
+polymorphic!(mul TranslateScale =>
+    (_mul_Point, Point, Point),
+    (_mul_TranslateScale, TranslateScale, TranslateScale),
+    (_mul_Line, Line, Line),
+    (_mul_Rect, Rect, Rect),
+    (_mul_CubicBez, CubicBez, CubicBez)
+);

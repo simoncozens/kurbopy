@@ -5,27 +5,24 @@ from .kurbopy import Circle
 from .kurbopy import CircleSegment
 from .kurbopy import ConstPoint
 from .kurbopy import CubicBez
-
+# CubicOffset XXX
 # CurveFitSample XXX
 from .kurbopy import Ellipse
 from .kurbopy import Insets
 from .kurbopy import Line
 from .kurbopy import LineIntersection
-
-# MinDistance XXX
+from .kurbopy import MinDistance
 from .kurbopy import Nearest
 from .kurbopy import PathEl
 from .kurbopy import PathSeg
 from .kurbopy import Point
 from .kurbopy import QuadBez
-
-# QuadSpline XXX
+from .kurbopy import QuadSpline
 from .kurbopy import Rect
 # RoundedRect XXX
 # RoundedRectRadii XXX
 # Segments XXX
 from .kurbopy import Size
-
 # Stroke XXX
 # StrokeOpts XXX
 # SVGArc XXX

@@ -1,8 +1,8 @@
-use crate::bezpath::BezPath;
 use crate::insets::Insets;
 use crate::point::Point;
 use crate::size::Size;
 use crate::vec2::Vec2;
+use crate::{impl_isfinitenan, impl_shape, polymorphic};
 use pyo3::types::PyType;
 
 use kurbo::{Rect as KRect, Shape};
@@ -121,13 +121,10 @@ impl Rect {
     fn origin(&self) -> Point {
         self.0.origin().into()
     }
-    // fn size(&self) -> Size {
-    //     self.0.size().into()
-    // }
 
-    /// The area of the rectangle.
-    fn area(&self) -> f64 {
-        self.0.area()
+    /// The size of the rectangle.
+    fn size(&self) -> Size {
+        self.0.size().into()
     }
 
     /// Whether this rectangle has zero area.
@@ -140,12 +137,6 @@ impl Rect {
     /// The center point of the rectangle.
     fn center(&self) -> Point {
         self.0.center().into()
-    }
-
-    /// Returns `true` if `point` lies within `self`.
-    #[pyo3(text_signature = "($self, p)")]
-    fn contains(&self, p: Point) -> bool {
-        self.0.contains(p.0)
     }
 
     /// Take absolute value of width and height.
@@ -264,90 +255,21 @@ impl Rect {
     fn contained_rect_with_aspect_ratio(&self, aspect_ratio: f64) -> Rect {
         self.0.contained_rect_with_aspect_ratio(aspect_ratio).into()
     }
-    /// Is this rectangle finite?
-    fn is_finite(&self) -> bool {
-        self.0.is_finite()
-    }
-    /// Is this rectangle NaN?
-    fn is_nan(&self) -> bool {
-        self.0.is_nan()
-    }
-
-    /// Convert to a Bézier path.
-    #[pyo3(text_signature = "($self, tolerance)")]
-    fn to_path(&self, tolerance: f64) -> BezPath {
-        self.0.to_path(tolerance).into()
-    }
-
-    /// Total length of perimeter.
-    #[pyo3(text_signature = "($self, accuracy)")]
-    fn perimeter(&self, accuracy: f64) -> f64 {
-        self.0.perimeter(accuracy)
-    }
-
-    /// The winding number of a point.
-    ///
-    /// This method only produces meaningful results with closed shapes.
-    ///
-    /// The sign of the winding number is consistent with that of ``area``,
-    /// meaning it is +1 when the point is inside a positive area shape
-    /// and -1 when it is inside a negative area shape. Of course, greater
-    /// magnitude values are also possible when the shape is more complex.
-    #[pyo3(text_signature = "($self, pt)")]
-    fn winding(&self, pt: Point) -> i32 {
-        self.0.winding(pt.0)
-    }
-
-    /// The smallest rectangle that encloses the shape.
-    fn bounding_box(&self) -> Rect {
-        self.0.bounding_box().into()
-    }
-
-    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
-        })
-    }
-
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
-        })
-    }
-
-    #[allow(non_snake_case)]
-    fn _add_Vec2(&self, rhs: &Vec2) -> PyResult<Rect> {
-        let p: Rect = (self.0 + rhs.0).into();
-        Ok(p)
-    }
-
-    #[allow(non_snake_case)]
-    fn _sub_Vec2(&self, rhs: &Vec2) -> PyResult<Rect> {
-        let p: Rect = (self.0 - rhs.0).into();
-        Ok(p)
-    }
-
-    #[allow(non_snake_case)]
-    fn _add_Insets(&self, rhs: &Insets) -> Rect {
-        (rhs.0 + self.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _sub_Rect(&self, rhs: &Rect) -> Insets {
-        (self.0 - rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _sub_Insets(&self, rhs: &Insets) -> Rect {
-        (rhs.0 - self.0).into()
-    }
 
     fn __repr__(&self) -> String {
         format!("{:?}", self.0)
     }
 }
+
+impl_isfinitenan!(Rect);
+impl_shape!(Rect);
+polymorphic!(add Rect => (_add_Vec2, Vec2, Rect),
+                         (_add_Insets, Insets, Rect)
+);
+polymorphic!(sub Rect => (_sub_Vec2, Vec2, Rect),
+                         (_sub_Insets, Insets, Rect),
+                         (_sub_Rect, Rect, Insets)
+);
 
 #[cfg(test)]
 mod tests {

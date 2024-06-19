@@ -1,7 +1,6 @@
 use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::quadbez::QuadBez;
-use crate::rect::Rect;
 use crate::{
     impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea,
     impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest,
@@ -10,7 +9,7 @@ use crate::{
 
 use kurbo::{
     CubicBez as KCubicBez, ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature,
-    ParamCurveDeriv, ParamCurveExtrema, ParamCurveNearest, Shape,
+    ParamCurveDeriv, ParamCurveExtrema, ParamCurveNearest,
 };
 use pyo3::prelude::*;
 

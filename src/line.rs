@@ -1,7 +1,6 @@
 use crate::constpoint::ConstPoint;
 use crate::nearest::Nearest;
 use crate::point::Point;
-use crate::rect::Rect;
 use crate::vec2::Vec2;
 use crate::{
     impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea, impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest

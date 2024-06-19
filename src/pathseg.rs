@@ -1,10 +1,13 @@
-use crate::cubicbez::CubicBez;
+use crate::pathel::PathEl;
+use crate::{impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea, impl_paramcurveextrema, impl_paramcurvenearest, impl_shape_no_bounding_box};
+use crate::{cubicbez::CubicBez, impl_isfinitenan};
 use crate::line::Line;
+use crate::mindistance::MinDistance;
 use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::quadbez::QuadBez;
 use kurbo::{
-    ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveNearest,
+    ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveExtrema, ParamCurveNearest,
     PathSeg as KPathSeg, LineIntersection as KLineIntersection
 };
 use pyo3::prelude::*;
@@ -45,24 +48,35 @@ impl PathSeg {
         }
     }
 
-    fn eval(&self, t: f64) -> Point {
-        self.0.eval(t).into()
+    /// Get the [`PathEl`] that is equivalent to discarding the segment start point.
+    pub fn as_path_el(&self) -> PathEl {
+        PathEl(self.0.as_path_el())
     }
-    fn subsegment(&self, start: f64, end: f64) -> PathSeg {
-        self.0.subsegment(start..end).into()
+
+    /// Returns a new `PathSeg` describing the same path as `self`, but with
+    /// the points reversed.
+    pub fn reverse(&self) -> PathSeg {
+        PathSeg(self.0.reverse())
     }
-    fn arclen(&self, accuracy: f64) -> f64 {
-        self.0.arclen(accuracy)
+    /// Convert this segment to a cubic bezier.
+    pub fn to_cubic(&self) -> CubicBez {
+        CubicBez(self.0.to_cubic())
     }
-    fn inv_arclen(&self, arclen: f64, accuracy: f64) -> f64 {
-        self.0.inv_arclen(arclen, accuracy)
+
+    /// Compute intersections against a line.
+    ///
+    /// Returns a vector of the intersections. For each intersection,
+    /// the `t` value of the segment and line are given.
+    ///
+    /// Note: This test is designed to be inclusive of points near the endpoints
+    /// of the segment. This is so that testing a line against multiple
+    /// contiguous segments of a path will be guaranteed to catch at least one
+    /// of them. In such cases, use higher level logic to coalesce the hits
+    /// (the `t` value may be slightly outside the range of 0..1).
+    pub fn intersect_line(&self, line: Line) -> Vec<LineIntersection> {
+        self.0.intersect_line(line.0).into_iter().map(|x| x.into()).collect()
     }
-    fn signed_area(&self) -> f64 {
-        self.0.signed_area()
-    }
-    fn nearest(&self, p: Point, accuracy: f64) -> Nearest {
-        self.0.nearest(p.0, accuracy).into()
-    }
+
 
     // Kurbo doesn't provide this because of the type system, but
     // we can!
@@ -81,7 +95,26 @@ impl PathSeg {
             KPathSeg::Cubic(cubic) => CubicBez(cubic).deriv().into_py(py),
         }
     }
+
+    /// Minimum distance between two [`PathSeg`]s.
+    ///
+    /// Returns a tuple of the distance, the path time `t1` of the closest point
+    /// on the first `PathSeg`, and the path time `t2` of the closest point on the
+    /// second `PathSeg`.
+    fn min_dist(&self, other: &PathSeg, accuracy: f64) -> MinDistance {
+        self.0.min_dist(other.0, accuracy).into()
+    }
 }
+
+impl_paramcurve!(PathSeg);
+impl_paramcurvearclen!(PathSeg);
+impl_paramcurvearea!(PathSeg);
+impl_paramcurveextrema!(PathSeg);
+impl_paramcurvenearest!(PathSeg);
+impl_isfinitenan!(PathSeg);
+impl_shape_no_bounding_box!(PathSeg);
+
+
 
 #[pyclass(subclass, module = "kurbopy")]
 #[derive(Clone, Debug)]
@@ -104,3 +137,4 @@ impl LineIntersection {
         self.0.segment_t
     }
 }
+impl_isfinitenan!(LineIntersection);

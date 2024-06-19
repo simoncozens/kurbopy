@@ -20,9 +20,11 @@ performance in high-accuracy conditions".
    ellipse
    insets
    line
+   mindistance
    pathseg
    point
    quadbez
+   quadspline
    rect
    size
    translatescale

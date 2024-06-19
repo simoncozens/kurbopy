@@ -10,6 +10,13 @@ def test_point_basic():
     assert str(p) == "<Point x=1.0 y=3.0>"
 
 
+def test_point_magic():
+    p = Point(1.0, 2.0) + Vec2(1.0, 1.0)
+    assert p.x == 2.0
+    p = Point(1.0, 2.0) + (1.0, 1.0)
+    assert p.x == 2.0
+
+
 def test_point_lerp():
     p1 = Point(0.0, 0.0)
     p2 = Point(1.0, 2.0)

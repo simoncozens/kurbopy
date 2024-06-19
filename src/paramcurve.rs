@@ -126,7 +126,7 @@ macro_rules! impl_paramcurveextrema {
                 self.0.extrema_ranges().iter().map(|r| (r.start, r.end)).collect()
             }
             /// The smallest rectangle that encloses the curve in the range (0..1).
-            fn bounding_box(&self) -> Rect {
+            fn bounding_box(&self) -> $crate::rect::Rect {
                 kurbo::ParamCurveExtrema::bounding_box(&self.0).into()
             }
         }

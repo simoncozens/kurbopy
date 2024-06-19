@@ -1,9 +1,9 @@
-use crate::{impl_isfinitenan, impl_shape};
-use crate::{bezpath::BezPath, point::Point};
+use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
+use crate::{impl_isfinitenan, impl_shape};
 
-use kurbo::{Circle as KCircle, Shape, CircleSegment as KCircleSegment};
+use kurbo::{Circle as KCircle, CircleSegment as KCircleSegment, Shape};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
@@ -40,42 +40,21 @@ impl Circle {
     pub fn set_radius(&mut self, radius: f64) {
         self.0.radius = radius
     }
-    
+
     /// Create a [`CircleSegment`] by cutting out parts of this circle.
     pub fn segment(&self, inner_radius: f64, start_angle: f64, sweep_angle: f64) -> CircleSegment {
         CircleSegment(self.0.segment(inner_radius, start_angle, sweep_angle))
     }
 
-    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
-        })
+    fn __add__(&self, v: Vec2) -> Circle {
+        Circle(self.0 + v.0)
     }
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
-        })
-    }
-    fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_mul")?.call1((slf, rhs))?.extract()
-        })
-    }
-    #[allow(non_snake_case)]
-    fn _add_Vec2(&self, rhs: Vec2) -> Circle {
-        Circle(self.0 + rhs.0)
-    }
-    #[allow(non_snake_case)]
-    fn _sub_Vec2(&self, rhs: Vec2) -> Circle {
-        Circle(self.0 + rhs.0)
+    fn __sub__(&self, v: Vec2) -> Circle {
+        Circle(self.0 - v.0)
     }
 }
 impl_isfinitenan!(Circle);
 impl_shape!(Circle);
-
 
 #[derive(Clone, Debug)]
 #[pyclass(subclass, module = "kurbopy")]
@@ -94,8 +73,20 @@ impl From<KCircleSegment> for CircleSegment {
 impl CircleSegment {
     /// Create a `CircleSegment` out of its constituent parts.
     #[new]
-    pub fn __new__(center: Point, outer_radius: f64, inner_radius: f64, start_angle: f64, sweep_angle: f64) -> Self {
-        Self(KCircleSegment::new(center.0, outer_radius, inner_radius, start_angle, sweep_angle))
+    pub fn __new__(
+        center: Point,
+        outer_radius: f64,
+        inner_radius: f64,
+        start_angle: f64,
+        sweep_angle: f64,
+    ) -> Self {
+        Self(KCircleSegment::new(
+            center.0,
+            outer_radius,
+            inner_radius,
+            start_angle,
+            sweep_angle,
+        ))
     }
 
     // getters and setters
@@ -139,7 +130,6 @@ impl CircleSegment {
     pub fn set_sweep_angle(&mut self, sweep_angle: f64) {
         self.0.sweep_angle = sweep_angle
     }
-
 
     fn __add__(&self, v: Vec2) -> CircleSegment {
         CircleSegment(self.0 + v.0)

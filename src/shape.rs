@@ -76,13 +76,13 @@ macro_rules! impl_shape_no_bounding_box {
         /// curves, it's probably best to subdivide to cubics. We leave that
         /// to the caller, which is why we don't give an accuracy param here.
         fn area(&self) -> f64 {
-            self.0.area()
+            kurbo::Shape::area(&self.0)
         }
 
         /// Total length of perimeter.
         #[pyo3(text_signature = "($self, accuracy)")]
         fn perimeter(&self, accuracy: f64) -> f64 {
-            self.0.perimeter(accuracy)
+            kurbo::Shape::perimeter(&self.0, accuracy)
         }
 
         /// The winding number of a point.
@@ -95,7 +95,7 @@ macro_rules! impl_shape_no_bounding_box {
         /// magnitude values are also possible when the shape is more complex.
         #[pyo3(text_signature = "($self, pt)")]
         fn winding(&self, pt: Point) -> i32 {
-            self.0.winding(pt.0)
+            kurbo::Shape::winding(&self.0, pt.0)
         }
 
         // /// The smallest rectangle that encloses the shape.
@@ -107,12 +107,12 @@ macro_rules! impl_shape_no_bounding_box {
         ///
         /// This is only meaningful for closed shapes.
         fn contains(&self, pt: Point) -> bool {
-            self.winding(pt) != 0
+            kurbo::Shape::contains(&self.0, pt.0)
         }
 
         /// Convert to a Bézier path.
         fn to_path(&self, tolerance: f64) -> $crate::bezpath::BezPath {
-            self.0.to_path(tolerance).into()
+            kurbo::Shape::to_path(&self.0, tolerance).into()
         }
     }
 }

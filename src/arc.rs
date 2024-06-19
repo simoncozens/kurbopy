@@ -1,4 +1,4 @@
-use crate::{bezpath::BezPath, impl_shape};
+use crate::impl_shape;
 use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;

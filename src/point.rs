@@ -1,4 +1,4 @@
-use crate::vec2::Vec2;
+use crate::{polymorphic, vec2::Vec2};
 use kurbo::Point as KPoint;
 use pyo3::prelude::*;
 
@@ -161,41 +161,25 @@ impl Point {
     }
 
     #[allow(non_snake_case)]
-    fn _add_Vec2(&self, rhs: Vec2) -> Point {
-        (self.0 + rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _iadd_Vec2(&mut self, other: Vec2) {
+    fn __iadd__(&mut self, other: Vec2) {
         self.0 += other.0;
     }
 
     #[allow(non_snake_case)]
-    fn _sub_Vec2(&self, rhs: Vec2) -> Point {
-        (self.0 - rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _isub_Vec2(&mut self, other: Vec2) {
+    fn __isub__(&mut self, other: Vec2) {
         self.0 -= other.0;
     }
-
-    fn __add__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_add")?.call1((slf, rhs))?.extract()
-        })
-    }
-
-    fn __sub__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_sub")?.call1((slf, rhs))?.extract()
-        })
-    }
-    // I can't work out how to do magic iadd/isub
 
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("<Point x={:?} y={:?}>", self.0.x, self.0.y))
     }
+    fn _add_tuple(&self, other: (f64, f64)) -> Self {
+        (self.0 + other).into()
+    }
+    fn _sub_tuple(&self, other: (f64, f64)) -> Self {
+        (self.0 - other).into()
+    }
 }
+
+polymorphic!(add Point => (_add_Vec2, Vec2, Point));
+polymorphic!(sub Point => (_sub_Vec2, Vec2, Point));

@@ -12,6 +12,7 @@ use crate::rect::Rect;
 use crate::vec2::Vec2;
 use kurbo::Affine as KAffine;
 use std::ops::Mul;
+use crate::{impl_isfinitenan, polymorphic};
 
 use pyo3::prelude::*;
 use pyo3::types::PyType;
@@ -21,6 +22,11 @@ use pyo3::types::PyType;
 #[derive(Clone, Debug)]
 pub struct Affine(pub KAffine);
 
+impl From<KAffine> for Affine {
+    fn from(p: KAffine) -> Self {
+        Self(p)
+    }
+}
 #[pymethods]
 impl Affine {
     #[classmethod]
@@ -253,16 +259,6 @@ impl Affine {
         Rect(self.0.transform_rect_bbox(rect.0))
     }
 
-    /// Is this map finite?
-    pub fn is_finite(&self) -> bool {
-        self.0.is_finite()
-    }
-
-    /// Is this map NaN?
-    pub fn is_nan(&self) -> bool {
-        self.0.is_nan()
-    }
-
     /// Returns the translation part of this affine map (`(self.0[4], self.0[5])`).
     pub fn translation(&self) -> Vec2 {
         Vec2(self.0.translation())
@@ -275,62 +271,10 @@ impl Affine {
         Affine(self.0.with_translation(trans.0))
     }
 
-    fn __mul__(slf: PyRef<'_, Self>, rhs: &Bound<PyAny>) -> PyResult<PyObject> {
-        Python::with_gil(|py| {
-            let magic = PyModule::import_bound(py, "kurbopy.magic")?;
-            magic.getattr("magic_mul")?.call1((slf, rhs))?.extract()
-        })
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_Point(&self, rhs: &Point) -> Point {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_Affine(&self, rhs: &Affine) -> Affine {
-        Affine(self.0.mul(rhs.0))
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_Arc(&self, rhs: &Arc) -> Arc {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_Circle(&self, rhs: &Circle) -> Ellipse {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_CubicBez(&self, rhs: &CubicBez) -> CubicBez {
-        self.0.mul(rhs.0).into()
-    }
-
     #[allow(non_snake_case)]
     fn _mul_BezPath(&self, rhs: &BezPath) -> BezPath {
         let path = rhs.path().clone();
         self.0.mul(path).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_Line(&self, rhs: &Line) -> Line {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_PathEl(&self, rhs: &PathEl) -> PathEl {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_PathSeg(&self, rhs: &PathSeg) -> PathSeg {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
-    fn _mul_QuadBez(&self, rhs: &QuadBez) -> QuadBez {
-        self.0.mul(rhs.0).into()
     }
 
     fn __eq__(&self, other: &Affine) -> bool {
@@ -338,12 +282,21 @@ impl Affine {
     }
 
     #[allow(non_snake_case)]
-    fn _mul_Ellipse(&self, rhs: &Ellipse) -> Ellipse {
-        self.0.mul(rhs.0).into()
-    }
-
-    #[allow(non_snake_case)]
     fn __rmul__(&self, rhs: f64) -> Affine {
         Affine(rhs * self.0)
     }
 }
+
+impl_isfinitenan!(Affine);
+polymorphic!(mul Affine =>
+    (_mul_Point, Point, Point),
+    (_mul_Affine, Affine, Affine),
+    (_mul_Arc, Arc, Arc),
+    (_mul_Circle, Circle, Ellipse),
+    (_mul_CubicBez, CubicBez, CubicBez),
+    (_mul_Line, Line, Line),
+    (_mul_PathEl, PathEl, PathEl),
+    (_mul_PathSeg, PathSeg, PathSeg),
+    (_mul_QuadBez, QuadBez, QuadBez),
+    (_mul_Ellipse, Ellipse, Ellipse)
+);

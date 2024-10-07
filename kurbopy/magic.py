@@ -1,4 +1,5 @@
 import functools
+import sys
 
 
 # This module allows for polymorphic operator overloading between objects of
@@ -24,8 +25,41 @@ def do_magic(self, rhs, methodname):
     raise TypeError("Cannot %s %s by %s" % (methodname, mytype, other_type))
 
 
+<<<<<<< HEAD
 for method in ["mul", "add", "sub", "isub", "iadd"]:
     magic = functools.partial(do_magic, methodname=method)
     magic.__name__ = method
     magic.__doc__ = "Magic method " + method
     globals()["magic_" + method] = magic
+=======
+def magic_sub(self, rhs):
+    other_type = get_magic_name(rhs)
+    mytype = get_magic_name(self)
+    if hasattr(self, "_sub_" + other_type):
+        return getattr(self, "_sub_" + other_type)(rhs)
+    raise TypeError("Cannot subtract %s from %s" % (other_type, mytype))
+
+
+def magic_isub(self, rhs):
+    other_type = get_magic_name(rhs)
+    mytype = get_magic_name(self)
+    if hasattr(self, "_isub_" + other_type):
+        return getattr(self, "_isub_" + other_type)(rhs)
+    raise TypeError("Cannot subtract %s from %s" % (other_type, mytype))
+
+
+def magic_add(self, rhs):
+    other_type = get_magic_name(rhs)
+    mytype = get_magic_name(self)
+    if hasattr(self, "_add_" + other_type):
+        return getattr(self, "_add_" + other_type)(rhs)
+    raise TypeError("Cannot add %s to %s" % (other_type, mytype))
+
+
+def magic_iadd(self, rhs):
+    other_type = get_magic_name(rhs)
+    mytype = get_magic_name(self)
+    if hasattr(self, "_iadd_" + other_type):
+        return getattr(self, "_iadd_" + other_type)(rhs)
+    raise TypeError("Cannot add %s to %s" % (other_type, mytype))
+>>>>>>> 729889f (Fix up magic operators)

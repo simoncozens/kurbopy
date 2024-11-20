@@ -130,7 +130,7 @@ def plot(self, ax, **kwargs):
     left, right = ax.get_xlim()
     top, bottom = ax.get_ylim()
     bounds = self.bounding_box()
-    bounds = bounds.inset(50)
+    bounds = bounds.inset(Insets.uniform(50))
     if not (left == 0.0 and right == 1.0 and top == 0.0 and bottom == 1.0):
         bounds = bounds.union_pt(Point(left, top))
         bounds = bounds.union_pt(Point(right, bottom))

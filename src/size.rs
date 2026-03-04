@@ -80,8 +80,8 @@ impl Size {
     /// Whether this size has zero area.
     ///
     /// Note: a size with negative area is not considered empty.
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
+    fn is_zero_area(&self) -> bool {
+        self.0.is_zero_area()
     }
 
     /// Returns a new size bounded by `min` and `max.`
@@ -153,8 +153,8 @@ impl Size {
     ///
     /// If the width is `0`, the output will be `sign(self.height) * infinity`. If The width and
     /// height are `0`, then the output will be `NaN`.
-    fn aspect_ratio(&self) -> f64 {
-        self.0.aspect_ratio()
+    fn aspect_ratio_width(&self) -> f64 {
+        self.0.aspect_ratio_width()
     }
 
     /// Convert this `Size` into a [`Rect`] with origin `(0.0, 0.0)`.

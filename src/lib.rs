@@ -25,12 +25,23 @@ mod vec2;
 
 use pyo3::prelude::*;
 
+use crate::bezpath::BezPath;
+
 #[pyfunction]
-fn cubics_to_quadratic_splines(curves: Vec<cubicbez::CubicBez>, accuracy: f64) -> Option<Vec<crate::quadspline::QuadSpline>> {
+fn cubics_to_quadratic_splines(
+    curves: Vec<cubicbez::CubicBez>,
+    accuracy: f64,
+) -> Option<Vec<crate::quadspline::QuadSpline>> {
     let kcurves: Vec<kurbo::CubicBez> = curves.iter().map(|x| x.0).collect();
-    kurbo::cubics_to_quadratic_splines(&kcurves, accuracy).map(|vecquads| {
-        vecquads.into_iter().map(|x| x.into()).collect()
-    })
+    kurbo::cubics_to_quadratic_splines(&kcurves, accuracy)
+        .map(|vecquads| vecquads.into_iter().map(|x| x.into()).collect())
+}
+
+#[pyfunction]
+fn offset_cubic(c: crate::cubicbez::CubicBez, d: f64, tolerance: f64) -> BezPath {
+    let mut inner = kurbo::BezPath::new();
+    kurbo::offset::offset_cubic(c.0, d, tolerance, &mut inner);
+    inner.into()
 }
 
 #[pymodule]
@@ -59,6 +70,7 @@ fn kurbopy(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<translatescale::TranslateScale>()?;
     m.add_class::<vec2::Vec2>()?;
     m.add_function(wrap_pyfunction!(cubics_to_quadratic_splines, m)?)?;
+    m.add_function(wrap_pyfunction!(offset_cubic, m)?)?;
     Ok(())
 }
 

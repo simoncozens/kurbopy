@@ -79,11 +79,11 @@ impl From<KBezPath> for BezPath {
 }
 
 impl BezPath {
-    pub(crate) fn path_mut(&mut self) -> MutexGuard<KBezPath> {
+    pub(crate) fn path_mut(&'_ mut self) -> MutexGuard<'_, KBezPath> {
         self._path.borrow_mut().lock().unwrap()
     }
 
-    pub(crate) fn path(&self) -> MutexGuard<KBezPath> {
+    pub(crate) fn path(&self) -> MutexGuard<'_, KBezPath> {
         self._path.lock().unwrap()
     }
 }
@@ -140,7 +140,7 @@ impl BezPath {
     /// Flatten the path, returning a list of points.
     fn flatten(&mut self, tolerance: f64) -> Vec<Point> {
         let mut v = vec![];
-        self.path().flatten(tolerance, |l| match l {
+        kurbo::flatten(self.path().iter(), tolerance, |l| match l {
             KPathEl::MoveTo(p) => v.push(p.into()),
             KPathEl::LineTo(p) => v.push(p.into()),
             _ => {}
@@ -341,12 +341,12 @@ impl BezPath {
         let mut rv = vec![];
         let mut pts1 = vec![];
         let mut pts2 = vec![];
-        b1.flatten(0.1, |el| match el {
+        kurbo::flatten(b1.iter(), 0.1, |el| match el {
             KPathEl::MoveTo(a) => pts1.push(a),
             KPathEl::LineTo(a) => pts1.push(a),
             _ => {}
         });
-        b2.flatten(0.1, |el| match el {
+        kurbo::flatten(b2.iter(), 0.1, |el| match el {
             KPathEl::MoveTo(a) => pts2.push(a),
             KPathEl::LineTo(a) => pts2.push(a),
             _ => {}

@@ -130,8 +130,8 @@ impl Rect {
     /// Whether this rectangle has zero area.
     ///
     /// Note: a rectangle with negative area is not considered empty.
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
+    fn is_zero_area(&self) -> bool {
+        self.0.is_zero_area()
     }
 
     /// The center point of the rectangle.
@@ -237,8 +237,8 @@ impl Rect {
     /// If the width is `0` the output will be ``sign(y1 - y0) * infinity``.
     ///
     /// If the width and height are `0`, the result will be `NaN`.
-    fn aspect_ratio(&self) -> f64 {
-        self.0.aspect_ratio()
+    fn aspect_ratio_width(&self) -> f64 {
+        self.0.aspect_ratio_width()
     }
 
     /// Returns the largest possible ``Rect`` that is fully contained in ``self``
@@ -252,8 +252,8 @@ impl Rect {
     /// For the special case where the aspect ratio is ``1.0``, the resulting
     /// ``Rect`` will be square.
     #[pyo3(text_signature = "($self, aspect_ratio)")]
-    fn contained_rect_with_aspect_ratio(&self, aspect_ratio: f64) -> Rect {
-        self.0.contained_rect_with_aspect_ratio(aspect_ratio).into()
+    fn inscribed_rect_with_aspect_ratio(&self, aspect_ratio: f64) -> Rect {
+        self.0.inscribed_rect_with_aspect_ratio(aspect_ratio).into()
     }
 
     fn __repr__(&self) -> String {

@@ -1,6 +1,6 @@
 use kurbo::Nearest as KNearest;
 use pyo3::prelude::*;
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct Nearest {
     pub distance_sq: f64,
@@ -31,5 +31,4 @@ impl Nearest {
     fn set_t(&mut self, value: f64) {
         self.t = value;
     }
-
 }

@@ -1,9 +1,10 @@
+use crate::point::Point;
+use crate::quadbez::QuadBez;
 use kurbo::QuadSpline as KQuadSpline;
-use crate::{point::Point, quadbez::QuadBez};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A quadratic Bézier spline in B-spline format.
 pub struct QuadSpline(pub KQuadSpline);
 

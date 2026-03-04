@@ -75,7 +75,7 @@ fn kurbopy(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 fn register_child_module(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "common")?;
+    let child_module = PyModule::new(parent_module.py(), "common")?;
     child_module.add_function(wrap_pyfunction!(
         common::factor_quartic_inner,
         &child_module

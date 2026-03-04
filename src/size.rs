@@ -5,7 +5,7 @@ use pyo3::types::PyType;
 use kurbo::Size as KSize;
 use pyo3::prelude::*;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A 2D size.
 pub struct Size(pub KSize);

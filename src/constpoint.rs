@@ -1,10 +1,9 @@
 use crate::{impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvederiv};
-use kurbo::{ParamCurveDeriv, ParamCurveArclen, ParamCurve};
-use kurbo::ConstPoint as KConstPoint;
+use kurbo::{ConstPoint as KConstPoint, ParamCurve, ParamCurveArclen, ParamCurveDeriv};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A single ConstPoint segment.
 pub struct ConstPoint(pub KConstPoint);
 

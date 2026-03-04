@@ -1,15 +1,19 @@
-use crate::{impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea, impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest, impl_shape_no_bounding_box};
-use crate::{cubicbez::CubicBez, impl_isfinitenan};
+use crate::cubicbez::CubicBez;
 use crate::line::Line;
 use crate::nearest::Nearest;
 use crate::point::Point;
+use crate::{
+    impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea,
+    impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest,
+    impl_shape_no_bounding_box,
+};
 use kurbo::{
     ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveDeriv,
     ParamCurveExtrema, ParamCurveNearest, QuadBez as KQuadBez,
 };
 use pyo3::prelude::*;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A single quadratic Bézier segment.
 pub struct QuadBez(pub KQuadBez);

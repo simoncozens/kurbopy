@@ -7,7 +7,7 @@ use kurbo::{Arc as KArc, Point as KPoint, Shape};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A single arc segment.
 pub struct Arc(pub KArc);
 

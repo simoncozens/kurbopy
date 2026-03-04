@@ -3,7 +3,8 @@ use crate::nearest::Nearest;
 use crate::point::Point;
 use crate::vec2::Vec2;
 use crate::{
-    impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea, impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest
+    impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea,
+    impl_paramcurvecurvature, impl_paramcurvederiv, impl_paramcurveextrema, impl_paramcurvenearest,
 };
 
 use kurbo::{
@@ -12,7 +13,7 @@ use kurbo::{
 };
 use pyo3::prelude::*;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A single line.
 pub struct Line(pub KLine);

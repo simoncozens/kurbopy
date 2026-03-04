@@ -10,15 +10,15 @@ use crate::point::Point;
 use crate::quadbez::QuadBez;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
+use crate::{impl_isfinitenan, polymorphic};
 use kurbo::Affine as KAffine;
 use std::ops::Mul;
-use crate::{impl_isfinitenan, polymorphic};
 
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
 /// A 2D affine transform.
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct Affine(pub KAffine);
 

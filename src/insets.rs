@@ -6,7 +6,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyType;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// Insets from the edges of a rectangle.
 ///
 ///
@@ -130,7 +130,7 @@ impl Insets {
     pub fn set_y1(&mut self, y1: f64) {
         self.0.y1 = y1
     }
-    
+
     #[classmethod]
     #[allow(non_snake_case)]
     /// Zeroed insets
@@ -217,9 +217,7 @@ impl Insets {
     fn __repr__(&self) -> String {
         // format!("Insets{{ x0:{}, y0: {}, x1: {}, y1: {} }}", self.0.x0, self.0.y0, self.0.x1, self.0.y1)
         format!("{:?}", self.0)
-
     }
-
 }
 
 impl_isfinitenan!(Insets);

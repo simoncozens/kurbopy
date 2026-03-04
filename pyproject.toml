@@ -18,7 +18,7 @@ bindings = "pyo3"
 
 # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 [tool.black]
-target-version = ["py37"]
+target-version = ["py312"]
 
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
 [tool.isort]

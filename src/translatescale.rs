@@ -1,16 +1,16 @@
 use crate::bezpath::BezPath;
+use crate::cubicbez::CubicBez;
 use crate::line::Line;
 use crate::point::Point;
+use crate::polymorphic;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
-use crate::cubicbez::CubicBez;
-use crate::polymorphic;
 
 use kurbo::TranslateScale as KTranslateScale;
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A transformation including scaling and translation.
 ///
@@ -97,14 +97,13 @@ impl TranslateScale {
         (self.0 + rhs.0).into()
     }
 
-    // We need to define this one manually because we don't have a 
+    // We need to define this one manually because we don't have a
     // newtype wrapper for BezPath.
     #[allow(non_snake_case)]
     fn _mul_BezPath(&self, bez: BezPath) -> BezPath {
         (self.0 * &*bez.path()).into()
     }
 }
-
 
 polymorphic!(mul TranslateScale =>
     (_mul_Point, Point, Point),

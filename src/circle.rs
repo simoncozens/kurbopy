@@ -7,7 +7,7 @@ use kurbo::{Circle as KCircle, CircleSegment as KCircleSegment, Shape};
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A circle.
 pub struct Circle(pub KCircle);
 
@@ -57,7 +57,7 @@ impl_isfinitenan!(Circle);
 impl_shape!(Circle);
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A segment of a circle.
 ///
 /// If `inner_radius > 0`, then the shape will be a doughnut segment.

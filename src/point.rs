@@ -1,8 +1,9 @@
-use crate::{polymorphic, vec2::Vec2};
+use crate::polymorphic;
+use crate::vec2::Vec2;
 use kurbo::Point as KPoint;
 use pyo3::prelude::*;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A 2D point.
 pub struct Point(pub KPoint);

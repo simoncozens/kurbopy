@@ -1,9 +1,10 @@
 use kurbo::PathEl as KPathEl;
 use pyo3::prelude::*;
 
-use crate::{impl_isfinitenan, point::Point};
+use crate::impl_isfinitenan;
+use crate::point::Point;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct PathEl(pub KPathEl);
 

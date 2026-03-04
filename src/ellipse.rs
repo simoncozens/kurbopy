@@ -1,15 +1,15 @@
 use crate::affine::Affine;
-use crate::{impl_isfinitenan, impl_shape};
 use crate::point::Point;
 use crate::rect::Rect;
 use crate::vec2::Vec2;
+use crate::{impl_isfinitenan, impl_shape};
 
 use kurbo::{Ellipse as KEllipse, Shape};
 use pyo3::prelude::*;
 use pyo3::types::PyType;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A Ellipse.
 pub struct Ellipse(pub KEllipse);
 

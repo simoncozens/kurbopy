@@ -1,18 +1,21 @@
-use crate::pathel::PathEl;
-use crate::{impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea, impl_paramcurveextrema, impl_paramcurvenearest, impl_shape_no_bounding_box};
-use crate::{cubicbez::CubicBez, impl_isfinitenan};
+use crate::cubicbez::CubicBez;
 use crate::line::Line;
 use crate::mindistance::MinDistance;
 use crate::nearest::Nearest;
+use crate::pathel::PathEl;
 use crate::point::Point;
 use crate::quadbez::QuadBez;
+use crate::{
+    impl_isfinitenan, impl_paramcurve, impl_paramcurvearclen, impl_paramcurvearea,
+    impl_paramcurveextrema, impl_paramcurvenearest, impl_shape_no_bounding_box,
+};
 use kurbo::{
-    ParamCurve, ParamCurveArclen, ParamCurveArea, ParamCurveCurvature, ParamCurveExtrema, ParamCurveNearest,
-    PathSeg as KPathSeg, LineIntersection as KLineIntersection
+    LineIntersection as KLineIntersection, ParamCurve, ParamCurveArclen, ParamCurveArea,
+    ParamCurveCurvature, ParamCurveExtrema, ParamCurveNearest, PathSeg as KPathSeg,
 };
 use pyo3::prelude::*;
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct PathSeg(pub KPathSeg);
 
@@ -74,9 +77,12 @@ impl PathSeg {
     /// of them. In such cases, use higher level logic to coalesce the hits
     /// (the `t` value may be slightly outside the range of 0..1).
     pub fn intersect_line(&self, line: Line) -> Vec<LineIntersection> {
-        self.0.intersect_line(line.0).into_iter().map(|x| x.into()).collect()
+        self.0
+            .intersect_line(line.0)
+            .into_iter()
+            .map(|x| x.into())
+            .collect()
     }
-
 
     // Kurbo doesn't provide this because of the type system, but
     // we can!
@@ -88,12 +94,12 @@ impl PathSeg {
         }
     }
 
-    fn deriv(&self, py: Python) -> PyObject {
-        match self.0 {
-            KPathSeg::Line(line) => Line(line).deriv().into_py(py),
-            KPathSeg::Quad(quad) => QuadBez(quad).deriv().into_py(py),
-            KPathSeg::Cubic(cubic) => CubicBez(cubic).deriv().into_py(py),
-        }
+    fn deriv(&self, py: Python) -> Result<Py<PyAny>, PyErr> {
+        Ok(match self.0 {
+            KPathSeg::Line(line) => Line(line).deriv().into_pyobject(py)?.unbind().into(),
+            KPathSeg::Quad(quad) => QuadBez(quad).deriv().into_pyobject(py)?.unbind().into(),
+            KPathSeg::Cubic(cubic) => CubicBez(cubic).deriv().into_pyobject(py)?.unbind().into(),
+        })
     }
 
     /// Minimum distance between two [`PathSeg`]s.
@@ -114,9 +120,7 @@ impl_paramcurvenearest!(PathSeg);
 impl_isfinitenan!(PathSeg);
 impl_shape_no_bounding_box!(PathSeg);
 
-
-
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 pub struct LineIntersection(pub KLineIntersection);
 

@@ -14,7 +14,7 @@ use kurbo::{
 use pyo3::prelude::*;
 
 #[derive(Clone, Debug)]
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 /// A single cubic Bézier segment.
 pub struct CubicBez(pub KCubicBez);
 

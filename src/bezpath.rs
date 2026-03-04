@@ -16,7 +16,7 @@ use pyo3::prelude::*;
 use std::borrow::BorrowMut;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-#[pyclass(subclass, module = "kurbopy")]
+#[pyclass(from_py_object, module = "kurbopy")]
 #[derive(Clone, Debug)]
 /// A Bézier path.
 ///
@@ -404,15 +404,15 @@ impl SegmentIterator {
     fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
         slf
     }
-    fn __next__(&mut self, py: Python) -> Option<PyObject> {
+    fn __next__(&mut self, py: Python) -> Result<Option<Py<PyAny>>, PyErr> {
         let item = self.items.lock().unwrap().segments().nth(self.index);
         self.index += 1;
-        match item {
+        Ok(match item {
             None => None,
-            Some(KPathSeg::Line(l)) => Some(Line::from(l).into_py(py)),
-            Some(KPathSeg::Quad(q)) => Some(QuadBez::from(q).into_py(py)),
-            Some(KPathSeg::Cubic(c)) => Some(CubicBez::from(c).into_py(py)),
-        }
+            Some(KPathSeg::Line(l)) => Some(Line::from(l).into_pyobject(py)?.into()),
+            Some(KPathSeg::Quad(q)) => Some(QuadBez::from(q).into_pyobject(py)?.into()),
+            Some(KPathSeg::Cubic(c)) => Some(CubicBez::from(c).into_pyobject(py)?.into()),
+        })
     }
 
     fn __len__(&self) -> usize {
@@ -441,11 +441,14 @@ impl ElementIterator {
     fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
         slf
     }
-    fn __next__(&mut self, py: Python) -> Option<PyObject> {
+    fn __next__(&mut self, py: Python) -> Result<Option<Py<PyAny>>, PyErr> {
         let path = self.items.lock().unwrap();
         let item = path.elements().get(self.index);
         self.index += 1;
-        item.map(|p| PathEl(*p).into_py(py))
+        Ok(item
+            .map(|p| PathEl(*p).into_pyobject(py))
+            .transpose()?
+            .map(|x| x.into()))
     }
 
     fn __len__(&self) -> usize {

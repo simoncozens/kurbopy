@@ -28,6 +28,7 @@ from .kurbopy import Size
 # SVGArc XXX
 from .kurbopy import TranslateScale
 from .kurbopy import Vec2
+from .kurbopy import cubics_to_quadratic_splines, offset_cubic
 from fontTools.pens.basePen import BasePen
 from kurbopy.magic import magic_mul, magic_add, magic_sub
 import re

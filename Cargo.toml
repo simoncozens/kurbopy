@@ -1,6 +1,6 @@
 [package]
 name = "kurbopy"
-version = "0.13.0"
+version = "0.13.1"
 authors = ["Simon Cozens <simon@simon-cozens.org>"]
 edition = "2021"
 rust-version = "1.65"

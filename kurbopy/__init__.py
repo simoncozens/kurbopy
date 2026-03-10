@@ -169,3 +169,8 @@ class BezPathCreatingPen(BasePen):
         self.path.close_path()
         self.paths.append(self.path)
         self.path = BezPath()
+
+    def _endPath(self):
+        if len(self.path.elements()) > 0:
+            self.paths.append(self.path)
+        self.path = BezPath()

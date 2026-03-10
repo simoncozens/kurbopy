@@ -399,6 +399,40 @@ impl BezPath {
             index: 0,
         }
     }
+
+    /// Draw the path using a pen object that implements the same API as a
+    /// `fontTools.pens.basePen.BasePen` (or any pen that implements the same API).
+    fn draw(&self, py: Python<'_>, pen: Py<PyAny>) -> PyResult<()> {
+        let mut open = false;
+        for el in self.path().iter() {
+            match el {
+                // moveTo(Tuple[float, float]) -> None
+                KPathEl::MoveTo(p) => {
+                    if open {
+                        pen.call_method0(py, "endPath")?;
+                    }
+                    open = true;
+                    pen.call_method1(py, "moveTo", ((p.x, p.y),))
+                }
+                // lineTo(Tuple[float, float]) -> None
+                KPathEl::LineTo(p) => pen.call_method1(py, "lineTo", ((p.x, p.y),)),
+                KPathEl::QuadTo(p1, p2) => {
+                    pen.call_method1(py, "qCurveTo", ((p1.x, p1.y), (p2.x, p2.y)))
+                }
+                KPathEl::CurveTo(p1, p2, p3) => {
+                    pen.call_method1(py, "curveTo", ((p1.x, p1.y), (p2.x, p2.y), (p3.x, p3.y)))
+                }
+                KPathEl::ClosePath => {
+                    open = false;
+                    pen.call_method0(py, "closePath")
+                }
+            }?;
+        }
+        if open {
+            pen.call_method0(py, "endPath")?;
+        }
+        Ok(())
+    }
 }
 
 #[pyclass]

@@ -6,6 +6,7 @@ mod common;
 mod constpoint;
 mod cubicbez;
 mod ellipse;
+mod fit;
 mod insets;
 mod line;
 mod magic;
@@ -26,6 +27,7 @@ mod vec2;
 use pyo3::prelude::*;
 
 use crate::bezpath::BezPath;
+use crate::fit::fit_to_bezpath;
 
 #[pyfunction]
 fn cubics_to_quadratic_splines(
@@ -71,6 +73,7 @@ fn kurbopy(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<vec2::Vec2>()?;
     m.add_function(wrap_pyfunction!(cubics_to_quadratic_splines, m)?)?;
     m.add_function(wrap_pyfunction!(offset_cubic, m)?)?;
+    m.add_function(wrap_pyfunction!(fit_to_bezpath, m)?)?;
     Ok(())
 }
 

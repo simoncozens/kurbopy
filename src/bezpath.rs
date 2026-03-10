@@ -13,6 +13,7 @@ use kurbo::{
     PathSeg as KPathSeg, Shape, Vec2,
 };
 use pyo3::prelude::*;
+use pyo3::types::PyType;
 use std::borrow::BorrowMut;
 use std::sync::{Arc, Mutex, MutexGuard};
 
@@ -95,6 +96,13 @@ impl BezPath {
         BezPath {
             _path: Arc::new(Mutex::new(KBezPath::new())),
         }
+    }
+
+    #[classmethod]
+    fn from_svg(_cls: &Bound<'_, PyType>, svg: String) -> PyResult<BezPath> {
+        Ok(KBezPath::from_svg(&svg)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("{}", e)))?
+            .into())
     }
 
     /// Removes the last [`PathEl`] from the path and returns it, or `None` if the path is empty.

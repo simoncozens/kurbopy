@@ -5,6 +5,7 @@ from .kurbopy import Circle
 from .kurbopy import CircleSegment
 from .kurbopy import ConstPoint
 from .kurbopy import CubicBez
+
 # CubicOffset XXX
 # CurveFitSample XXX
 from .kurbopy import Ellipse
@@ -19,16 +20,18 @@ from .kurbopy import Point
 from .kurbopy import QuadBez
 from .kurbopy import QuadSpline
 from .kurbopy import Rect
+
 # RoundedRect XXX
 # RoundedRectRadii XXX
 # Segments XXX
 from .kurbopy import Size
+
 # Stroke XXX
 # StrokeOpts XXX
 # SVGArc XXX
 from .kurbopy import TranslateScale
 from .kurbopy import Vec2
-from .kurbopy import cubics_to_quadratic_splines, offset_cubic
+from .kurbopy import cubics_to_quadratic_splines, offset_cubic, fit_to_bezpath
 from fontTools.pens.basePen import BasePen
 from kurbopy.magic import magic_mul, magic_add, magic_sub
 import re
